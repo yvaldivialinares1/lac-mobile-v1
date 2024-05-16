@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Regression iOS 16 - iPhone 14 Plus" parallel="tests" thread-count="6">
+    <parameter name="framework.platform.name" value="iOS"></parameter>
+    <parameter name="framework.platform.version" value="16"></parameter>
+    <parameter name="framework.device.name" value="iPhone 14 Plus"></parameter>
+    <parameter name="framework.mobile.app" value="StaffAppIosLts"></parameter>
+    <test verbose="1" name="Sample">
+        <classes>
+            <class name="runner.StaffAppRunnerTest"></class>
+        </classes>
+    </test>
+</suite>
