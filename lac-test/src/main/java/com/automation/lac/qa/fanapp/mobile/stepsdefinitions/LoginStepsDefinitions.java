@@ -1,7 +1,10 @@
 package com.automation.lac.qa.fanapp.mobile.stepsdefinitions;
 
 import static com.automation.lac.qa.fanapp.api.models.MissionsCredentialsFile.getValidCredentials;
+import static com.automation.lac.qa.fanapp.api.tasks.identity.IdentityTask.deleteVehiclesAndTeammates;
+import static com.automation.lac.qa.fanapp.api.tasks.payments.PaymentsMethodsTask.deleteAllPaymentsMethods;
 import static com.automation.lac.qa.fanapp.mobile.enums.FanAppKeys.USER_INFO;
+import static com.automation.lac.qa.pages.MobileBaseScreen.isAndroid;
 import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 
 import com.automation.lac.qa.faker.models.UserInfo;
@@ -11,11 +14,14 @@ import com.automation.lac.qa.fanapp.mobile.questions.LoginScreenQuestions;
 import com.automation.lac.qa.fanapp.mobile.tasks.home.WelcomeHomeTask;
 import com.automation.lac.qa.fanapp.mobile.tasks.initialpermissions.TurnOnNotificationTask;
 import com.automation.lac.qa.fanapp.mobile.tasks.login.LoginTask;
+import com.automation.lac.qa.fanapp.mobile.tasks.modals.AddBiometricsModalTask;
+import com.automation.lac.qa.fanapp.mobile.tasks.modals.GoCashlessModalTask;
 import com.automation.lac.qa.utils.CustomException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.qameta.allure.Step;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,6 +31,8 @@ public class LoginStepsDefinitions {
   private final WelcomeHomeTask welcomeHomeTask = new WelcomeHomeTask();
   private final LoginTask loginScreenTasks = new LoginTask();
   private final LoginScreenQuestions loginScreenQuestions = new LoginScreenQuestions();
+  private final AddBiometricsModalTask addBiometricsModalTask = new AddBiometricsModalTask();
+  private final GoCashlessModalTask goCashlessModalTask = new GoCashlessModalTask();
 
   /**
    *
@@ -103,7 +111,23 @@ public class LoginStepsDefinitions {
   @And("the user logs in with credentials for scenario {string}")
   public void logsInUsingFile(String scenarioNumber) {
     Account account = getValidCredentials(scenarioNumber);
+    resetUserInformation(account);
     welcomeHomeTask.goToLogin();
     loginScreenTasks.performLogin(account.getUserEmail(), account.getUserPassword());
+
+    //TODO Remove platform validation when biometrics modal is displayed on Android
+    if (!isAndroid())
+      addBiometricsModalTask.clickOnIllDoItLater();
+
+    if (!account.getOnboardingSteps().isPaymentMethod())
+      goCashlessModalTask.clickOnRemindMeLater();
+  }
+
+  @Step("reset user information")
+  private void resetUserInformation(Account account) {
+    String userId = account.getUserID();
+    deleteVehiclesAndTeammates(userId);
+    if (!account.getOnboardingSteps().isPaymentMethod())
+      deleteAllPaymentsMethods(userId);
   }
 }

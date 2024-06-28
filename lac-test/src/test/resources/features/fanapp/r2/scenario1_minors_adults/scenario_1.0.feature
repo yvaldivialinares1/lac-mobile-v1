@@ -34,8 +34,8 @@ Feature: Missions R2 - Scenario 1.0
     And the user logs in with credentials for scenario "1.0"
     When the user navigates to my payments
     And the user select payment method management from menu
-    Then the user validates the list of the payment cards in my profile
-    When the user navigates back to Home
+    And the user validates the list of the payment cards in my profile
+    And the user navigates back to Home
     And the user changes the view to Concert Fan
     And the user navigates to Tickets Screen
     And the user looks for the ticket

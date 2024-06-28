@@ -2,6 +2,7 @@ package com.automation.lac.qa.fanapp.mobile.tasks.tickets;
 
 import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED_TICKET_TYPE;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.SEARCH;
+import static com.automation.lac.qa.fanapp.mobile.enums.FanAppKeys.IS_PARKING_SELECTED;
 import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.TICKET_SEARCH;
 import static com.automation.lac.qa.utils.Constants.IS_EVENT_ENABLED;
 import static com.automation.lac.qa.utils.Constants.IS_GAME_ENABLED;
@@ -77,7 +78,10 @@ public class TicketFilterTask extends TicketFilterScreen {
   public TicketResponse getTicket(String clubType, TicketType ticketType) {
     if (clubType != null)
       return TicketTask.getAvailableClubTicket(clubType);
-    else  return TicketTask.getAvailableTicket(ticketType);
+    else if (getTestContext().get(IS_PARKING_SELECTED.name()))
+      return TicketTask.getTicketsAccordingToAvailabilityWithParkingAvailability(ticketType);
+    else
+      return TicketTask.getAvailableTicket(ticketType);
   }
 
   /**
@@ -90,10 +94,10 @@ public class TicketFilterTask extends TicketFilterScreen {
   public TicketResponse getAnyEligibleTicket(String clubType, TicketType ticketType,
                                              TicketType alternateTicketType) {
     TicketResponse ticketResponse;
-    ticketResponse = getTicket(clubType,ticketType);
+    ticketResponse = getTicket(clubType, ticketType);
     if (isNull(ticketResponse) && checkTestEligibility(alternateTicketType)) {
       changeTicketType(clubType, ticketType);
-      ticketResponse = getTicket(clubType,ticketType);
+      ticketResponse = getTicket(clubType, ticketType);
     }
     return ticketResponse;
   }
@@ -117,7 +121,7 @@ public class TicketFilterTask extends TicketFilterScreen {
         throw new SkipException(String.format("%s Feature is not enabled for this Env,"
           + " This test is eligible only for %s", ticketType.name(), ticketType.name()));
       Allure.step(String.format("%s Feature is not enabled for this Env, continuing test for %s",
-        TicketType.GAME, alternateTicketType));
+        ticketType.name(), alternateTicketType));
       getTestContext().set(SELECTED_TICKET_TYPE, alternateTicketType);
       return getTicket(clubType, ticketType);
     }

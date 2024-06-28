@@ -3,7 +3,6 @@ package com.automation.lac.qa.fanapp.mobile.stepsdefinitions;
 import static com.automation.lac.qa.faker.AleatoryData.createRandomInfo;
 import static com.automation.lac.qa.fanapp.api.models.CredentialsFile.Account;
 import static com.automation.lac.qa.fanapp.api.models.CredentialsFile.getValidCredentials;
-import static com.automation.lac.qa.fanapp.api.tasks.identity.IdentityTask.deleteVehiclesAndTeammates;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.CONCERT_FAN;
 import static com.automation.lac.qa.fanapp.mobile.enums.FanAppKeys.IS_CARD_ADDED;
 import static com.automation.lac.qa.fanapp.mobile.enums.FanAppKeys.SELECTED_THEME;
@@ -261,10 +260,5 @@ public class CommonsStep {
     } else {
       NavigationUtils.onboardingStagesTransition(stages);
     }
-  }
-
-  @And("the user basic information is removed")
-  public void removeUserInformation() {
-    deleteVehiclesAndTeammates("20dc9360-063f-4f34-b6b4-69c70327852b");
   }
 }

@@ -1,6 +1,5 @@
 package com.automation.lac.qa.fanapp.mobile.stepsdefinitions;
 
-import static com.automation.lac.qa.fanapp.api.tasks.TicketTask.getTicketsAccordingToAvailabilityWithParkingAvailability;
 import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED_PARKING_TICKET_COUNT;
 import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED_PARKING_TICKET_GARAGE;
 import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED_PARKING_TICKET_PARKING_TYPE_STATUS;
@@ -12,9 +11,9 @@ import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED
 import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED_TICKET_STATUS;
 import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED_TICKET_TIMESTAMP;
 import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED_TICKET_TYPE;
+import static com.automation.lac.qa.fanapp.mobile.enums.FanAppKeys.IS_PARKING_SELECTED;
 import static com.automation.lac.qa.fanapp.mobile.enums.TicketAvailability.AVAILABLE;
 import static com.automation.lac.qa.fanapp.mobile.enums.TicketAvailability.SOLD_OUT;
-import static com.automation.lac.qa.fanapp.mobile.enums.TicketType.PARKING;
 import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 import static java.util.Objects.isNull;
 
@@ -145,7 +144,8 @@ public class SearchTicketStepsDefinition {
                                                                 String ticketType,
                                                                 String ticketSoldOutStatus) {
     final TicketType ticket = TicketType.valueOf(ticketType.toUpperCase());
-    getTestContext().set(SELECTED_TICKET_TYPE, PARKING);
+    getTestContext().set(IS_PARKING_SELECTED.name(), true);
+    getTestContext().set(SELECTED_TICKET_TYPE, ticket);
     getTestContext().set(SELECTED_PARKING_TICKET_COUNT, parkingSeatCount);
     parkingTicketSoldOut =
       parkingTicketSoldOut.trim().equalsIgnoreCase("all") ? "without sold out" : "with sold out";
@@ -156,10 +156,11 @@ public class SearchTicketStepsDefinition {
         ticketSoldOutStatus.trim().equalsIgnoreCase("sold out") ? SOLD_OUT.getName()
           : AVAILABLE.getName());
     getTestContext().set(SELECTED_TICKET_STATUS, ticketSoldOutStatus);
-    TicketResponse ticketResponse =
-      getTicketsAccordingToAvailabilityWithParkingAvailability(ticket);
-    if (isNull(ticketResponse))
+    TicketResponse ticketResponse = ticketFilterTask.getTicketByFeature(null, ticket);
+    if (isNull(ticketResponse)) {
       throw new CustomException("No ticket is available to purchase with given parameters");
+    }
+    log.info("Selected Ticket is: " + ticketResponse);
     getTestContext().set(SELECTED_TICKET_RESPONSE, ticketResponse);
   }
 }

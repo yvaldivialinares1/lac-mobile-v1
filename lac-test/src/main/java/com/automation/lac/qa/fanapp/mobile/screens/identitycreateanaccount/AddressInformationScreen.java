@@ -20,7 +20,7 @@ public class AddressInformationScreen extends MobileBaseScreen {
 
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_input_address_line_2_field'"
     + " AND type == 'XCUIElementTypeTextField'")
-  @AndroidFindBy(uiAutomator = "resourceId(\"tfapp, suite, unit, building, floor, etc\")")
+  @AndroidFindBy(uiAutomator = "resourceId(\"tfAPT, SUITE, UNIT, BUILDING, FLOOR, ETC\")")
   private WebElement inputAppFloor;
 
   @iOSXCUITFindBy(accessibility = "id_dropdown_input_country_field")

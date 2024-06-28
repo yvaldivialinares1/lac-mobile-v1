@@ -9,7 +9,7 @@ import org.openqa.selenium.WebElement;
 @Getter
 public class PhoneNumberValidationScreen extends MobileBaseScreen {
 
-  @iOSXCUITFindBy(id = "TBD")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'message'")
   @AndroidFindBy(xpath = "//*[@resource-id='bgContainer']")
   private WebElement lblOtpNotification;
 

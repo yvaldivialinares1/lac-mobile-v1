@@ -1,6 +1,7 @@
 package com.automation.lac.qa.fanapp.api.tasks.payments;
 
-import com.automation.lac.qa.fanapp.api.services.payments.PaymentsMethodsService;
+import static com.automation.lac.qa.fanapp.api.services.payments.PaymentsMethodsService.deleteAllPaymentMethods;
+
 import com.automation.lac.qa.utils.CustomException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @UtilityClass
 public class PaymentsMethodsTask {
-
 
   /**
    * Deletes all payment methods for a given user.
@@ -21,7 +21,6 @@ public class PaymentsMethodsTask {
     if (userId == null || userId.trim().isEmpty()) {
       throw new CustomException("User ID cannot be null or empty");
     }
-    PaymentsMethodsService.deleteAllPaymentMethods(userId);
+    deleteAllPaymentMethods(userId);
   }
-
 }
