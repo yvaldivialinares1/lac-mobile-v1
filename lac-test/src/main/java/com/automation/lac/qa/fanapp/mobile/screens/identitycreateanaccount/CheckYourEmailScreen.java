@@ -17,7 +17,7 @@ public class CheckYourEmailScreen extends MobileBaseScreen {
   @AndroidFindBy(uiAutomator = "descriptionStartsWith(\"Code input\")")
   private WebElement inputNumberCode;
 
-  @iOSXCUITFindBy(accessibility = "primary_brush_button")
-  @AndroidFindBy(accessibility = "CONTINUE")
+  @iOSXCUITFindBy(accessibility = "id_btn_confirm_my_account_ds_button")
+  @AndroidFindBy(accessibility = "CONFIRM MY ACCOUNT")
   private WebElement btnContinue;
 }

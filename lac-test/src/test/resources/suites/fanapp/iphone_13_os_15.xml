@@ -4,8 +4,7 @@
     <parameter name="framework.platform.name" value="iOS"></parameter>
     <parameter name="framework.platform.version" value="15"></parameter>
     <parameter name="framework.device.name" value="iPhone 13"></parameter>
-    <parameter name="framework.mobile.app" value="LaClippersIosLts"></parameter>
-    <test verbose="1" name="Sample">
+    <test verbose="1" name="FanAppRunnerTest">
         <classes>
             <class name="runner.FanAppRunnerTest"></class>
         </classes>

@@ -1,172 +1,199 @@
 package com.automation.lac.qa.utils.mobile;
 
-import static com.automation.lac.qa.driver.AppiumConstants.NEW_COMMAND_TIMEOUT;
+import static com.automation.lac.qa.driver.AppiumConstants.WAIT_TIMEOUT;
+import static com.automation.lac.qa.pages.MobileBaseScreen.getDriver;
+import static com.automation.lac.qa.utils.mobile.DeviceActions.getElement;
+import static java.util.Arrays.asList;
+import static org.openqa.selenium.support.ui.ExpectedConditions.alertIsPresent;
+import static org.openqa.selenium.support.ui.ExpectedConditions.attributeContains;
 import static org.openqa.selenium.support.ui.ExpectedConditions.not;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
-import com.automation.lac.qa.pages.MobileBaseScreen;
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.pagefactory.Widget;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.FluentWait;
 
 @Slf4j
 @UtilityClass
 public class WaitActions {
 
-  private AppiumDriver getDriver() {
-    return MobileBaseScreen.getDriver();
+  private static final String MESSAGE = "The element '";
+
+  public static void setImplicitWait(Duration duration) {
+    getDriver().manage().timeouts().implicitlyWait(duration);
   }
 
-  private WebDriverWait driverWait() {
-    return new WebDriverWait(getDriver(), Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+  public static void resetImplicitWait() {
+    setImplicitWait(Duration.ofSeconds(WAIT_TIMEOUT));
   }
 
   /**
-   * Waits for an element to either become not visible or disabled within a specified time frame.
+   * Creates a configurable FluentWait instance.
+   *
+   * @param <T>                the type of the input object
+   * @param object             the object to wait on
+   * @param timeoutDuration    the maximum time to wait
+   * @param pollingDuration    the interval to check the condition
+   * @param timeoutMessage     the message for timeout exception
+   * @param exceptionsToIgnore the exceptions to ignore during polling
+   * @return a configured FluentWait instance
+   */
+  @SafeVarargs
+  public static <T> FluentWait<T> createFluentWait(
+    T object,
+    Duration timeoutDuration,
+    Duration pollingDuration,
+    String timeoutMessage,
+    Class<? extends Throwable>... exceptionsToIgnore) {
+    return new FluentWait<>(object)
+      .withTimeout(timeoutDuration)
+      .pollingEvery(pollingDuration)
+      .withMessage(timeoutMessage)
+      .ignoreAll(asList(exceptionsToIgnore));
+  }
+
+  /**
+   * Checks if the specified element becomes invisible within a given time frame.
    *
    * @param timeInSeconds The time in seconds to wait for the element to become invisible.
-   * @param element       The WebElement to check for visibility or enabled status.
-   * @return element
+   * @param element       The {@link WebElement} to check for invisibility.
+   * @return {@code true} if the element becomes invisible within the specified time.
    */
-  public static WebElement waitForElementNotVisibleOrDisabled(int timeInSeconds,
-                                                              WebElement element) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
-    driverWait().withTimeout(Duration.ofSeconds(timeInSeconds))
-      .pollingEvery(Duration.ofSeconds(1))
-      .until(ExpectedConditions.invisibilityOf(element));
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
-    return element;
-  }
-
-  /**
-   * Wait for element to be enabled, if not enabled it returns false and continues.
-   *
-   * @param element       element to wait for
-   * @param timeInSeconds time to wait the element
-   * @return boolean indicating if element is isEnabled or not
-   */
-  public static boolean waitForElementAvailability(WebElement element, int timeInSeconds) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+  public static boolean isTheElementInvisible(WebElement element, int timeInSeconds) {
+    setImplicitWait(Duration.ofSeconds(0));
     try {
-      return driverWait().withTimeout(Duration.ofSeconds(timeInSeconds))
-        .pollingEvery(Duration.ofSeconds(1))
-        .until(not(ExpectedConditions.stalenessOf(element)));
-    } catch (TimeoutException | NoSuchElementException e) {
+      waitElementDisappear(element, timeInSeconds);
+      return true;
+    } catch (NoSuchElementException | TimeoutException exception) {
       return false;
     } finally {
-      getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+      resetImplicitWait();
     }
   }
 
   /**
-   * Wait for element to be is not enabled and not visible,
-   * if not enabled it returns false and continues.
+   * Waits for the specified element to become invisible within a given time frame.
    *
-   * @param element       element to wait for
-   * @param timeInSeconds time to wait the element
-   * @return boolean indicating if element is isEnabled or not
+   * @param element       The {@link WebElement} to wait for to become invisible.
+   * @param timeInSeconds The time in seconds to wait for the element to become invisible.
    */
-  public static boolean waitForElementUnavailability(WebElement element, int timeInSeconds) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
-    try {
-      return driverWait().withTimeout(Duration.ofSeconds(timeInSeconds))
-        .pollingEvery(Duration.ofSeconds(1))
-        .until(new ExpectedCondition<>() {
-          @Override
-          public Boolean apply(WebDriver driver) {
-            try {
-              return (!element.isDisplayed() && !element.isEnabled());
-            } catch (Exception e) {
-              return true;
-            }
-          }
+  public static void waitElementDisappear(WebElement element, int timeInSeconds) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      MESSAGE + element + "' is still visible", NoSuchElementException.class).until(
+      ExpectedConditions.invisibilityOf(element));
+  }
 
-          @Override
-          public String toString() {
-            return "element to not be visible or not be enabled: " + element;
-          }
-        });
+  /**
+   * Checks if the specified element becomes available (visible and present)
+   * within a given time frame.
+   *
+   * @param element       The {@link WebElement} to check for availability.
+   * @param timeInSeconds The time in seconds to wait for the element to become available.
+   * @return {@code true} if the element becomes available within the specified time.
+   */
+  public static boolean isTheElementAvailable(WebElement element, int timeInSeconds) {
+    setImplicitWait(Duration.ofSeconds(0));
+    try {
+      waitElementWillBeAvailable(element, timeInSeconds);
+      return true;
     } catch (TimeoutException | NoSuchElementException e) {
       return false;
     } finally {
-      getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+      resetImplicitWait();
     }
   }
 
   /**
-   * Waits for an element to be clickable within a specified time frame.
+   * Waits for the specified element to become available (visible and present)
+   * within a given time frame.
+   *
+   * @param element       The {@link WebElement} to wait for to become available.
+   * @param timeInSeconds The time in seconds to wait for the element to become available.
+   */
+  public static void waitElementWillBeAvailable(WebElement element, int timeInSeconds) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      MESSAGE + element + "' is not available", NoSuchElementException.class)
+      .until(not(ExpectedConditions.stalenessOf(element)));
+  }
+
+  /**
+   * Waits for the specified element to become unavailable (either invisible or not present)
+   * within a given time frame.
+   *
+   * @param element       The {@link WebElement} to wait for to become unavailable.
+   * @param timeInSeconds The time in seconds to wait for the element to become unavailable.
+   */
+  public static void waitElementWillBeUnavailable(WebElement element, int timeInSeconds) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      MESSAGE + element + "' is available", NoSuchElementException.class)
+      .until(ExpectedConditions.stalenessOf(element));
+  }
+
+  /**
+   * Waits for the specified element to become clickable within a given time frame.
    *
    * @param timeInSeconds The time in seconds to wait for the element to become clickable.
-   * @param element       The WebElement to wait for to be clickable.
-   * @return element
+   * @param element       The {@link WebElement} to wait for to become clickable.
    */
-  public static WebElement waitForElementToBeClickable(int timeInSeconds, WebElement element) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
-    driverWait().withTimeout(Duration.ofSeconds(timeInSeconds))
-      .pollingEvery(Duration.ofSeconds(1))
-      .until(ExpectedConditions.elementToBeClickable(element));
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
-    return element;
+  public static void waitForElementToBeClickable(WebElement element, int timeInSeconds) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      MESSAGE + element + "' is not clickable", NoSuchElementException.class).until(
+      ExpectedConditions.elementToBeClickable(element));
   }
 
   /**
-   * Waits for an element to be selected within a specified time frame.
+   * Waits for the specified element to become selected within a given time frame.
    *
    * @param timeInSeconds The time in seconds to wait for the element to become selected.
-   * @param element       The WebElement to wait for to be selected.
-   * @return element
+   * @param element       The {@link WebElement} to wait for to become selected.
    */
-  public static WebElement waitForElementToBeSelected(int timeInSeconds, WebElement element) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
-    driverWait().withTimeout(Duration.ofSeconds(timeInSeconds))
-      .pollingEvery(Duration.ofSeconds(1))
-      .until(ExpectedConditions.elementToBeSelected(element));
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
-    return element;
+  public static void waitForElementToBeSelected(int timeInSeconds, WebElement element) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      MESSAGE + element + "' is not selected", NoSuchElementException.class).until(
+      ExpectedConditions.elementToBeSelected(element));
   }
 
   /**
-   * Waits for a list of widgets to be non-empty within a specified time frame.
+   * Checks if the specified list of web elements is not empty within a given time frame.
    *
-   * @param timeInSeconds The time in seconds to wait for the list of widgets to become non-empty.
-   * @param elements      The list of widgets to check for non-emptiness.
+   * @param elements      The list of {@link WebElement} to check.
+   * @param timeInSeconds The time in seconds to wait for the list to become non-empty.
+   * @return {@code true} if the list is not empty within the specified time.
    */
-  public static void waitForListWidgetsIsNotEmpty(int timeInSeconds,
-                                                  List<? extends Widget> elements) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
-    driverWait().withTimeout(Duration.ofSeconds(timeInSeconds))
-      .pollingEvery(Duration.ofSeconds(1))
-      .until(driver -> !elements.isEmpty());
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+  public static boolean isTheListOfElementsNotEmpty(List<WebElement> elements, int timeInSeconds) {
+    setImplicitWait(Duration.ofSeconds(0));
+    try {
+      waitForListOfElementsIsNotEmpty(elements, timeInSeconds);
+      return true;
+    } catch (NoSuchElementException | TimeoutException e) {
+      return false;
+    } finally {
+      resetImplicitWait();
+    }
   }
 
   /**
-   * Waits for a list of WebElement to be non-empty within a specified time frame.
+   * Waits for the specified list of web elements to become non-empty within a given time frame.
    *
-   * @param timeInSeconds Time in seconds to wait for the list of WebElement to become non-empty.
-   * @param elements      List of WebElement to check for non-emptiness.
+   * @param elements      The list of {@link WebElement} to wait for.
+   * @param timeInSeconds The time in seconds to wait for the list to become non-empty.
    */
-  public static void waitForListWebElementsIsNotEmpty(int timeInSeconds,
-                                                      List<WebElement> elements) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
-    driverWait().withTimeout(Duration.ofSeconds(timeInSeconds))
-      .pollingEvery(Duration.ofSeconds(1))
+  public static void waitForListOfElementsIsNotEmpty(List<WebElement> elements,
+                                                     int timeInSeconds) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      elements + " is empty", NoSuchElementException.class, TimeoutException.class)
       .until(driver -> !elements.isEmpty());
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
   }
 
   /**
@@ -175,17 +202,15 @@ public class WaitActions {
    * @param element The WebElement to check for visibility.
    * @return true if the element is visible, false otherwise.
    */
-  public static boolean quickIsDisplayed(WebElement element) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+  public static boolean elementIsDisplayed(WebElement element) {
+    setImplicitWait(Duration.ofSeconds(0));
     try {
-      element.isDisplayed();
-      log.info("Element is displayed");
-      return true;
+      return element.isDisplayed();
     } catch (Exception e) {
-      log.warn("Element is not displayed");
+      log.warn("Element does not exist");
       return false;
     } finally {
-      getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+      resetImplicitWait();
     }
   }
 
@@ -197,16 +222,14 @@ public class WaitActions {
    * @return {@code true} if the element is displayed, {@code false} otherwise.
    */
   public static boolean quickIsDisplayed(String xpathElement, int timeInSeconds) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(timeInSeconds));
+    setImplicitWait(Duration.ofSeconds(timeInSeconds));
     try {
-      getDriver().findElement(By.xpath(xpathElement)).isDisplayed();
-      log.info("Element {} is displayed", xpathElement);
-      return true;
+      return getDriver().findElement(By.xpath(xpathElement)).isDisplayed();
     } catch (Exception e) {
       log.warn("Element {} is not displayed", xpathElement);
       return false;
     } finally {
-      getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+      resetImplicitWait();
     }
   }
 
@@ -216,16 +239,15 @@ public class WaitActions {
    * @param element The WebElement to check enabled property.
    * @return true if the element is enabled, false otherwise.
    */
-  public static boolean quickIsEnabled(WebElement element) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+  public static boolean elementIsEnabled(WebElement element) {
+    setImplicitWait(Duration.ofSeconds(0));
     try {
-      element.isEnabled();
-      return true;
+      return element.isEnabled();
     } catch (Exception e) {
       log.warn("Element is not enabled");
       return false;
     } finally {
-      getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+      resetImplicitWait();
     }
   }
 
@@ -235,16 +257,15 @@ public class WaitActions {
    * @param element The WebElement to check selected property.
    * @return true if the element is selected, false otherwise.
    */
-  public static boolean quickIsSelected(WebElement element) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+  public static boolean elementIsSelected(WebElement element) {
+    setImplicitWait(Duration.ofSeconds(0));
     try {
-      element.isSelected();
-      return true;
+      return element.isSelected();
     } catch (Exception e) {
       log.warn("Element is not selected");
       return false;
     } finally {
-      getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+      resetImplicitWait();
     }
   }
 
@@ -255,17 +276,15 @@ public class WaitActions {
    * @param timeInSeconds time to wait the element
    * @return boolean indicating if element is found or not
    */
-  public static boolean waitForElementVisibility(WebElement element, int timeInSeconds) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+  public static boolean isTheElementVisible(WebElement element, int timeInSeconds) {
+    setImplicitWait(Duration.ofSeconds(0));
     try {
-      driverWait().withTimeout(Duration.ofSeconds(timeInSeconds))
-        .pollingEvery(Duration.ofSeconds(1))
-        .until(visibilityOf(element));
-      return element != null && element.isDisplayed();
-    } catch (StaleElementReferenceException | TimeoutException | NoSuchElementException var4) {
+      waitForElementVisibility(element, timeInSeconds);
+      return element.isDisplayed();
+    } catch (StaleElementReferenceException | TimeoutException | NoSuchElementException e) {
       return false;
     } finally {
-      getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+      resetImplicitWait();
     }
   }
 
@@ -276,35 +295,187 @@ public class WaitActions {
    * @param timeInSeconds time to wait the element
    * @return boolean indicating if element is found or not
    */
-  public static boolean waitForElementVisibility(By by, int timeInSeconds) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+  public static boolean isTheElementVisible(By by, int timeInSeconds) {
+    setImplicitWait(Duration.ofSeconds(0));
     try {
-      WebElement element = driverWait().withTimeout(Duration.ofSeconds(timeInSeconds))
-        .pollingEvery(Duration.ofSeconds(1))
-        .until(ExpectedConditions.visibilityOfElementLocated(by));
-      return element.isDisplayed();
-    } catch (StaleElementReferenceException | TimeoutException | NoSuchElementException var4) {
+      return waitForElementVisibility(by, timeInSeconds).isDisplayed();
+    } catch (StaleElementReferenceException | TimeoutException | NoSuchElementException e) {
       return false;
     } finally {
-      getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+      resetImplicitWait();
     }
   }
 
   /**
-   * Wait for reminder card to set in screen
-   * @param seconds to wait for reminder card
+   * Waits for the specified element to become visible within a given time frame.
+   *
+   * @param element       The {@link WebElement} to wait for to become visible.
+   * @param timeInSeconds The time in seconds to wait for the element to become visible.
    */
-  public static void waitForReminderCardToAppear(int seconds) {
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+  public static void waitForElementVisibility(WebElement element, int timeInSeconds) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      MESSAGE + element + "' is not visible", NoSuchElementException.class).until(
+      visibilityOf(element));
+  }
+
+  /**
+   * Waits for the element located by the specified {@link By} locator to become
+   * visible within a given time frame.
+   *
+   * @param by            The {@link By} locator used to find the element.
+   * @param timeInSeconds The time in seconds to wait for the element to become visible.
+   * @return The {@link WebElement} if it becomes visible within the specified time.
+   */
+  public static WebElement waitForElementVisibility(By by, int timeInSeconds) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      MESSAGE + by + "' is not visible", NoSuchElementException.class).until(
+      ExpectedConditions.visibilityOfElementLocated(by));
+    return getElement(by);
+  }
+
+
+  /**
+   * Waits for a specified amount of time, allowing a process to finish.
+   *
+   * @param timeInSeconds The time in seconds to wait for the process to complete.
+   */
+  public static void waitForProcessToFinish(int timeInSeconds) {
     StopWatch stopWatch = StopWatch.createStarted();
     boolean firstTime = true;
-    while (stopWatch.getTime(TimeUnit.SECONDS) < seconds) {
+    while (stopWatch.getTime(TimeUnit.SECONDS) < timeInSeconds) {
       if (firstTime) {
-        log.info("Waiting for reminder to appear");
+        log.info("Waiting for process to finish");
         firstTime = false;
       }
     }
     stopWatch.stop();
-    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+  }
+
+  /**
+   * Waits for the specified element's attribute to contain a specified value
+   * within a given time frame.
+   *
+   * @param element       The {@link WebElement} whose attribute is to be checked.
+   * @param attribute     The name of the attribute to check.
+   * @param value         The value that the attribute should contain.
+   * @param timeInSeconds Time in seconds to wait for the attribute to contain the specified value.
+   * @return {@code true} if the attribute contains the specified value within the given time.
+   */
+  public static boolean isTheElementAttributeContainsTheValue(
+    WebElement element, String attribute, String value, int timeInSeconds) {
+    setImplicitWait(Duration.ofSeconds(0));
+    try {
+      waitForElementAttributeContainsValue(element, attribute, value, timeInSeconds);
+      return true;
+    } catch (Exception e) {
+      return false;
+    } finally {
+      resetImplicitWait();
+    }
+  }
+
+  /**
+   * Waits for the specified element's attribute to contain a specified value
+   * within a given time frame.
+   *
+   * @param element       The {@link WebElement} whose attribute is to be checked.
+   * @param attribute     The name of the attribute to check.
+   * @param value         The value that the attribute should contain.
+   * @param timeInSeconds Time in seconds to wait for the attribute to contain the specified value.
+   */
+  public static void waitForElementAttributeContainsValue(
+    WebElement element, String attribute, String value, int timeInSeconds) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      MESSAGE + element + "' with the attribute '" + attribute
+        + "' not contains expected value " + value, NoSuchElementException.class)
+      .until(attributeContains(element, attribute, value));
+  }
+
+  /**
+   * Checks if the specified element's attribute does not contain a specified value
+   * within a given time frame.
+   *
+   * @param element       The {@link WebElement} whose attribute is to be checked.
+   * @param attribute     The name of the attribute to check.
+   * @param value         The value that the attribute should not contain.
+   * @param timeInSeconds Time in seconds to wait for the attribute not contain the specified value.
+   * @return {@code true} if the attribute does not contain the specified value within that time.
+   */
+  public static boolean isTheElementAttributeNotContainsTheValue(
+    WebElement element, String attribute, String value, int timeInSeconds) {
+    setImplicitWait(Duration.ofSeconds(0));
+    try {
+      waitForElementAttributeNotContainsValue(element, attribute, value, timeInSeconds);
+      return true;
+    } catch (Exception e) {
+      return false;
+    } finally {
+      resetImplicitWait();
+    }
+  }
+
+  /**
+   * Waits for the element's attribute to not contain a specified value within a given time frame.
+   *
+   * @param element       The {@link WebElement} whose attribute is to be checked.
+   * @param attribute     The name of the attribute to check.
+   * @param value         The value that the attribute should not contain.
+   * @param timeInSeconds The time in seconds to wait for the attribute to not contain the value.
+   */
+  public static void waitForElementAttributeNotContainsValue(
+    WebElement element, String attribute, String value, int timeInSeconds) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      MESSAGE + element + "' with attribute '" + attribute
+        + "' contains expected value " + value, NoSuchElementException.class)
+      .until(not(attributeContains(element, attribute, value)));
+  }
+
+  /**
+   * Waits until an alert becomes visible within a given time frame and returns it.
+   *
+   * @param timeInSeconds The time in seconds to wait for the alert to become visible.
+   * @return The {@link Alert} object if it becomes visible within the specified time.
+   */
+  public static Alert waitUntilAlertIsVisible(int timeInSeconds) {
+    return createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      "Alert is not visible", NoSuchElementException.class).until(alertIsPresent());
+  }
+
+  /**
+   * Checks if the element's attribute matches a specified value within a given time frame.
+   *
+   * @param element       The {@link WebElement} whose attribute is to be checked.
+   * @param timeInSeconds The time in seconds to wait for the attribute to match the value.
+   * @param attribute     The name of the attribute to check.
+   * @param value         The value that the attribute should match.
+   * @return {@code true} if the attribute matches the value within the time.
+   */
+  public static boolean isTheElementAttributeToBeValue(
+    WebElement element, int timeInSeconds, String attribute, String value) {
+    setImplicitWait(Duration.ofSeconds(0));
+    try {
+      waitForElementAttributeValue(element, attribute, value, timeInSeconds);
+      return true;
+    } catch (TimeoutException | NoSuchElementException e) {
+      return false;
+    } finally {
+      resetImplicitWait();
+    }
+  }
+
+  /**
+   * Waits for the element's attribute to match a specified value within a given time frame.
+   *
+   * @param element       The {@link WebElement} whose attribute is to be checked.
+   * @param attribute     The name of the attribute to check.
+   * @param value         The value that the attribute should match.
+   * @param timeInSeconds The time in seconds to wait for the attribute to match the value.
+   */
+  public static void waitForElementAttributeValue(
+    WebElement element, String attribute, String value, int timeInSeconds) {
+    createFluentWait(getDriver(), Duration.ofSeconds(timeInSeconds), Duration.ofSeconds(1),
+      MESSAGE + element + "' with attribute '" + attribute
+        + "' does not have the expected value " + value, NoSuchElementException.class)
+      .until(ExpectedConditions.attributeToBe(element, attribute, value));
   }
 }

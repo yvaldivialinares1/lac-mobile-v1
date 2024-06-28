@@ -1,6 +1,5 @@
 package com.automation.lac.qa.fanapp.mobile.screens.tickets;
 
-
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
@@ -8,19 +7,17 @@ import java.util.List;
 import lombok.Getter;
 import org.openqa.selenium.WebElement;
 
-
-
 @Getter
 public class TicketListScreen extends MobileBaseScreen {
 
   @AndroidFindBy(xpath = "//android.widget.TextView[starts-with(@resource-id,'tvTicketsTab')]")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'top_tab_bar_option')]"
-          + "//XCUIElementTypeStaticText")
+    + "//XCUIElementTypeStaticText")
   private List<WebElement> lstCategory;
 
   @AndroidFindBy(xpath = "//android.widget.TextView[starts-with(@resource-id,'tvTicketTitle')]")
   @iOSXCUITFindBy(xpath = "(//XCUIElementTypeStaticText[starts-with(@name,"
-          + "'carousel_ticket_name_label')])")
+    + "'carousel_ticket_name_label')])")
   private WebElement ticketType;
 
   @AndroidFindBy(xpath = "//*[starts-with(@resource-id,'Single Game')]")
@@ -51,24 +48,24 @@ public class TicketListScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(accessibility = "navigation_bar_title_label")
   private WebElement ticketScreenHeader;
 
-  @AndroidFindBy(xpath = "//*[@resource-id='tvTicketsTab0']")
-  @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='Clippers games']/..")
+  @AndroidFindBy(id = "tvTicketsTabClippers games")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'Clippers games' AND type CONTAINS 'Button'")
   private WebElement btnClippers;
 
-  @AndroidFindBy(xpath = "//*[@resource-id='tvTicketsTab1']")
-  @iOSXCUITFindBy(accessibility = "top_tab_bar_option_1")
+  @AndroidFindBy(id = "tvTicketsTabEvents")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'Events' AND type CONTAINS 'Button'")
   private WebElement btnEvents;
 
-  @AndroidFindBy(xpath = "//*[@resource-id='tvTicketsTab2']")
-  @iOSXCUITFindBy(accessibility = "top_tab_bar_option_2")
+  @AndroidFindBy(id = "tvTicketsTabParking passes")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'Parking passes' AND type CONTAINS 'Button'")
   private WebElement btnParkingPasses;
 
   @iOSXCUITFindBy(xpath = " (//XCUIElementTypeStaticText[starts-with(@name,"
-          + "'ticket_list_row_opponent_name_label_')]//ancestor::XCUIElementTypeButton)[last()]")
+    + "'ticket_list_row_opponent_name_label_')]//ancestor::XCUIElementTypeButton)[last()]")
   private WebElement lastTicketIos;
 
   @iOSXCUITFindBy(xpath = " (//XCUIElementTypeStaticText[starts-with(@name,"
-          + "'event_list_row_date_label_')]//ancestor::XCUIElementTypeOther)[last()]")
+    + "'event_list_row_date_label_')]//ancestor::XCUIElementTypeOther)[last()]")
   private WebElement lastEventTicketIos;
 
   @AndroidFindBy(xpath = "//android.view.View[@resource-id='boxSingleGameTicket0']")
@@ -93,7 +90,7 @@ public class TicketListScreen extends MobileBaseScreen {
 
   @AndroidFindBy(xpath = "//*[@resource-id='tvSingleGameErrorViewSubTitle']")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[@name="
-          + "'error_view_error_description_label']")
+    + "'error_view_error_description_label']")
   private WebElement errorViewSubTitle;
 
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[starts-with(@name,'date_')]")
@@ -102,65 +99,74 @@ public class TicketListScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[starts-with(@name,'date_')]")
   private List<WebElement> innerCalenderDatesiOS;
 
-
   @AndroidFindBy(xpath = "//android.view.View[@resource-id='tvTicketsTab0']/..")
   @iOSXCUITFindBy(accessibility = "top_tab_bar_bottom_brush_image")
   private WebElement imgTopBarBottomBrush;
 
-
   @AndroidFindBy(xpath = "//android.widget.TextView[@resource-id='tvEventTicketTitle']")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'ticket_list_row_')]"
-          + "//XCUIElementTypeStaticText")
+    + "//XCUIElementTypeStaticText")
   private List<WebElement> lstEventTicketTitle;
 
   @AndroidFindBy(xpath =
-          "//android.widget.TextView[@resource-id='tvSingleGameTicketOpponentTeamName']")
+    "//android.widget.TextView[@resource-id='tvSingleGameTicketOpponentTeamName']")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[starts-with(@name,"
-          + "'ticket_list_row_opponent_name_label')]/..")
+    + "'ticket_list_row_opponent_name_label')]/..")
   private List<WebElement> lstOpponentTeamNameFromGameTickets;
 
-
-  @AndroidFindBy(xpath =
-          "//android.widget.TextView[@resource-id='boxSingleGameTicket0']")
+  @AndroidFindBy(xpath = "//android.widget.TextView[@resource-id='boxSingleGameTicket0']")
   @iOSXCUITFindBy(xpath =
-          "//XCUIElementTypeOther[@name='ticket_list_row_0']//XCUIElementTypeStaticText")
+    "//XCUIElementTypeOther[@name='ticket_list_row_0']//XCUIElementTypeStaticText")
   private WebElement firstOpponentTeamNameFromGameTickets;
 
-  @AndroidFindBy(xpath =
-          "//android.widget.TextView[@resource-id='tvSingleGameTicketGameInfoDate']")
+  @AndroidFindBy(xpath = "//android.widget.TextView[@resource-id='tvSingleGameTicketGameInfoDate']")
   @iOSXCUITFindBy(xpath =
-          "//XCUIElementTypeStaticText[starts-with(@name,'ticket_list_row_date_label_')]")
+    "//XCUIElementTypeStaticText[starts-with(@name,'ticket_list_row_date_label_')]")
   private List<WebElement> lstGameTicketDates;
 
   @AndroidFindBy(xpath = "//android.widget.TextView[@resource-id='rowEventTicketDate']")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'ticket_list_row_')]"
-          + "//XCUIElementTypeStaticText")
+    + "//XCUIElementTypeStaticText")
   private List<WebElement> lstEventTicketDates;
 
   @AndroidFindBy(accessibility = "Back")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[@name='Back']")
   private WebElement btnBack;
 
-
   @AndroidFindBy(xpath = "//android.widget.TextView[starts-with"
-          + "(@resource-id,'boxSingleGameTicket')]")
-  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'ticket_list_row')]"
-          + "/XCUIElementTypeStaticText")
+    + "(@resource-id,'boxSingleGameTicket')]")
+  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'ticket_list_row')]/"
+    + "XCUIElementTypeStaticText")
   private List<WebElement> lstGameTickets;
 
   @AndroidFindBy(xpath = "//android.widget.TextView[starts-with"
-          + "(@resource-id,'boxEventTicket')]")
-  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'ticket_list_row')]"
-          + "/XCUIElementTypeStaticText")
+    + "(@resource-id,'boxEventTicket')]")
+  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'ticket_list_row')]/"
+    + "XCUIElementTypeStaticText")
   private List<WebElement> lstEventTickets;
 
   @AndroidFindBy(xpath = "//android.widget.TextView[starts-with(@resource-id,'boxParkingPasses')]")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'parking_pass_list_row')]"
-          + "/XCUIElementTypeStaticText")
+    + "/XCUIElementTypeStaticText")
   private List<WebElement> lstParkingPassesTickets;
 
   @AndroidFindBy(accessibility = "Reload content")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@label='Reload content']")
   private WebElement btnReloadContent;
 
+  @AndroidFindBy(xpath = "//android.widget.TextView[@resource-id='boxEventTicket0']/..")
+  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'ticket_list_row')]/..")
+  private WebElement scrollEventTicketView;
+
+  @AndroidFindBy(xpath = "//android.widget.TextView[@resource-id='boxSingleGameTicket0']/..")
+  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'ticket_list_row')]/..")
+  private WebElement scrollGameTicketView;
+
+  @AndroidFindBy(xpath = "//android.widget.TextView[@resource-id='boxParkingPasses0']/..")
+  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[starts-with(@name,'ticket_list_row')]/..")
+  private WebElement scrollParkingTicketView;
+
+  protected String androidEventDateXpath = "//android.widget.TextView[contains(@text,'%s')]";
+
+  protected String iosEventDateXpath = "//XCUIElementTypeStaticText[contains(@value,'%s')]";
 }

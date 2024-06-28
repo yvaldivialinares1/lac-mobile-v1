@@ -89,7 +89,7 @@ public class PropertiesManager {
       }
       properties.load(input);
     } catch (IOException exception) {
-      throw new CustomException(exception.getMessage());
+      throw new CustomException(exception);
     }
   }
 

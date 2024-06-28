@@ -6,9 +6,10 @@ import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.PASSWO
 import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.USER_NAME;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.sendKeys;
-import static com.automation.lac.qa.utils.mobile.WaitActions.quickIsDisplayed;
 
 import com.automation.lac.qa.fanapp.mobile.screens.login.LoginScreen;
+import com.automation.lac.qa.utils.mobile.WaitActions;
+import io.qameta.allure.Step;
 
 public class LoginTask extends LoginScreen {
 
@@ -19,10 +20,22 @@ public class LoginTask extends LoginScreen {
    * @param password String
    */
   public void performLogin(String username, String password) {
-    if (quickIsDisplayed(getBtnLogInWithAnotherAccount())) {
+    if (WaitActions.elementIsDisplayed(getBtnLogInWithAnotherAccount())) {
       click(getBtnLogInWithAnotherAccount(), LOG_IN_WITH_ANOTHER_ACCOUNT.getValue());
     }
     fillOutLoginForm(username, password);
+    click(getBtnSignIn(), SING_IN.getValue());
+  }
+
+  /**
+   * Perform Login using only the password.
+   * This method is used when the username is not required for the login process.
+   *
+   * @param password The password to enter, must not be null or empty.
+   */
+  @Step("Perform login using only the {password}")
+  public void performLogin(String password) {
+    sendKeys(getInputPassword(), password, PASSWORD.getValue());
     click(getBtnSignIn(), SING_IN.getValue());
   }
 

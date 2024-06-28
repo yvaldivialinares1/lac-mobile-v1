@@ -32,8 +32,8 @@ public class MyAccountSettingsScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_btn_delete_my_account'")
   private WebElement btnDeleteMyAccount;
 
-  @AndroidFindBy(uiAutomator = "textContains(\"LOG OUT\")")
-  @iOSXCUITFindBy(iOSNsPredicate = "name == 'LOG OUT'")
+  @AndroidFindBy(accessibility = "Log Out   Button, Double tap to activate")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_home_my_profile_logout_title'")
   private WebElement btnLogOut;
 
   @AndroidFindBy(uiAutomator = "descriptionContains(\"Back\")")

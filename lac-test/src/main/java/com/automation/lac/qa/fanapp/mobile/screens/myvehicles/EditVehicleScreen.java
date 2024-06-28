@@ -42,7 +42,7 @@ public class EditVehicleScreen extends VehicleScreen {
   private WebElement frmInputColor;
 
   @AndroidFindBy(xpath = "//android.widget.TextView[contains(@content-desc,'Save changes')]/..")
-  @iOSXCUITFindBy(accessibility = "primary_brush_button")
+  @iOSXCUITFindBy(accessibility = "primary_rectangle_button")
   private WebElement btnSaveChanges;
 
   @AndroidFindBy(uiAutomator = "new UiSelector().resourceId('modalContentView')")

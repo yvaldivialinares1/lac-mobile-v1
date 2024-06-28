@@ -1,5 +1,7 @@
 package com.automation.lac.qa.fanapp.mobile.screens.educationals;
 
+import com.automation.lac.qa.fanapp.mobile.screens.identitycreateanaccount.components.EnableCameraWidget;
+import com.automation.lac.qa.fanapp.mobile.screens.identitycreateanaccount.components.GameFaceIdDataWidget;
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
@@ -10,16 +12,15 @@ import org.openqa.selenium.WebElement;
 public class GameFaceIdEducationalScreen extends MobileBaseScreen {
 
   @AndroidFindBy(uiAutomator = "descriptionContains(\"GameFaceId,\")")
-  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_image' AND label BEGINSWITH 'game face'")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_image' AND label CONTAINS 'game face'")
   private WebElement imgGameFaceIdLogo;
 
   @AndroidFindBy(uiAutomator = "resourceId(\"GameFaceEducationalScreentvTitle\")")
-  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_label_title' AND label BEGINSWITH 'game face'")
-  //@iOSXCUITFindBy(iOSNsPredicate = "name == \"id_label_title\"")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_label_title' AND label CONTAINS 'game face'")
   private WebElement lblSetGameFaceIdTitle;
 
   @AndroidFindBy(uiAutomator = "resourceId(\"GameFaceEducationalScreenbtnPrimary\")")
-  @iOSXCUITFindBy(iOSNsPredicate = "name CONTAINS 'GAME FACE' AND type CONTAINS 'Button'")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'SET MY GAME FACE ID' AND type CONTAINS 'Button'")
   private WebElement btnSetGameFaceId;
 
   @AndroidFindBy(uiAutomator = "description(\"Back\")")
@@ -29,4 +30,30 @@ public class GameFaceIdEducationalScreen extends MobileBaseScreen {
   @AndroidFindBy(uiAutomator = "text(\"Skip\")")
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_btn_navigation_option_skip_with_text'")
   private WebElement btnSkip;
+
+  @AndroidFindBy(id = "tvPrimaryCta")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'CONTINUE' AND type == 'XCUIElementTypeButton'")
+  private WebElement btnContinue;
+
+  @AndroidFindBy(id = "btnSAVE MY GAME FACE ID")
+  @iOSXCUITFindBy(iOSNsPredicate = "TBD")
+  private WebElement saveGameFaceId;
+
+  @AndroidFindBy(id = "com.android.permissioncontroller:id/grant_dialog")
+  @iOSXCUITFindBy(xpath = "TBD")
+  private EnableCameraWidget enableCameraWidget;
+
+  @AndroidFindBy(id = "modalContentView")
+  @iOSXCUITFindBy(xpath = "TBD")
+  private GameFaceIdDataWidget gameFaceIdDataWidget;
+
+  public String getUnavailableGameFaceImgXpath() {
+    String iosXpath = "//XCUIElementTypeOther[contains(@name,'faceId_unavailable_perk')]";
+    return isAndroid() ? "//android.view.View[contains(@content-desc,'UnavailableStep']" : iosXpath;
+  }
+
+  public String getErrorXpath() {
+    String iosXpath = "//XCUIElementTypeStaticText[contains(@name,'OOPS!')]";
+    return isAndroid() ? "//android.widget.TextView[contains(@text,'OOPS!')]" : iosXpath;
+  }
 }

@@ -1,9 +1,9 @@
 Feature: Login
 
-  @loginSuccess
+  @loginSuccess @pr_review
   Scenario Outline: Login into Clippers fan app
-    Given An adult who has personal information generated
-    And The user doesn’t have a Clipper account but is registered on the NBA
+    Given the user is an adult who has personal information generated
+    And the user doesn't have a Clippers account but is registered on the NBA
     And A user opens the Los Angeles Clippers application
     When A user logs in using the user "<user>" and password "<password>"
     Then A user should be able to see the home screen

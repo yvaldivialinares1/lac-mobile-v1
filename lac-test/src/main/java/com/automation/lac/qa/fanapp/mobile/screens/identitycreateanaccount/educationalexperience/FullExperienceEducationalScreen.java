@@ -10,6 +10,6 @@ import org.openqa.selenium.WebElement;
 public class FullExperienceEducationalScreen extends MobileBaseScreen {
 
   @AndroidFindBy(id = "IntuitDomeIntroScreenbtnPrimary")
-  @iOSXCUITFindBy(iOSNsPredicate = "name == 'Live the full experience' AND type CONTAINS 'Button'")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_btn_primary_ds_button'")
   private WebElement btnLiveTheFullExperience;
 }

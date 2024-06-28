@@ -19,8 +19,9 @@ When implementing a new task, please adhere to the following principles:
 
 Here is an example of how a simple task class might be structured:
 
+### Example 1 without design patterns:
 ```java
-public class LandingScreenTasks extends LandingScreen {
+public class LandingTask extends LandingScreen {
 
  /**
  * Performs the actions necessary to grant notification permission.
@@ -33,8 +34,55 @@ public class LandingScreenTasks extends LandingScreen {
     DeviceActions.click(getContinueButton());
     DeviceActions.click(getWhileUsingAppOption());
   }
+}
+```
 
-  public void clickOnLoginButton() {
-    DeviceActions.click(getLoginOption());
+### Example 2 with fluent interface:
+The `grantNotificationPermission` method in the `LandingTask` class demonstrates the fluent interface design pattern. This pattern allows for a more readable and fluent way to perform a sequence of actions. Each method in the chain returns the current instance of the class, enabling the chaining of multiple method calls in a single statement.
+
+#### Example: Granting Notification Permission
+
+The `grantNotificationPermission` method performs the necessary actions to grant notification permission by clicking through the notification permission workflow on the landing screen.
+
+```java
+public class LandingTask extends LandingScreen {
+
+  /**
+   * Performs the actions necessary to grant notification permission.
+   *
+   * Clicks through the notification permission workflow on the landing screen.
+   */
+  public LandingTask grantNotificationPermission() {
+    DeviceActions.click(getContinueButton());
+    DeviceActions.click(getAllowButton());
+    DeviceActions.click(getContinueButton());
+    DeviceActions.click(getWhileUsingAppOption());
+    return this;
   }
 }
+
+```
+### Example 3 with method chaining:
+The `grantNotificationPermission` method in the `LandingTask` class demonstrates the method chaining design pattern. This pattern allows for a more fluent and readable way to perform a sequence of actions. Each method in the chain returns an instance of the class, enabling the chaining of multiple method calls in a single statement.
+
+  #### Example: Granting Notification Permission
+
+  The `grantNotificationPermission` method performs the necessary actions to grant notification permission by clicking through the notification permission workflow on the landing screen.
+
+  ```java
+public class LandingTask extends LandingScreen {
+
+  /**
+   * Performs the actions necessary to grant notification permission.
+   *
+   * Clicks through the notification permission workflow on the landing screen.
+   */
+  public WelcomeHomeTask grantNotificationPermission() {
+    DeviceActions.click(getContinueButton());
+    DeviceActions.click(getAllowButton());
+    DeviceActions.click(getContinueButton());
+    DeviceActions.click(getWhileUsingAppOption());
+    return new WelcomeHomeTask();
+  }
+}
+```

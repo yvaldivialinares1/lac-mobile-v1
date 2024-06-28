@@ -1,6 +1,12 @@
 package com.automation.lac.qa.staffapp.api.tasks;
 
+import static com.automation.lac.qa.staffapp.constants.ContextConstants.ADULT_INTUIT_DOME_ACCOUNT;
+import static com.automation.lac.qa.staffapp.constants.ContextConstants.GARAGE_CATEGORY;
+import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
+
+import com.automation.lac.qa.staffapp.api.enums.GarageCategoryType;
 import com.automation.lac.qa.staffapp.api.models.identity.IntuitDomeAccountDto;
+import com.automation.lac.qa.staffapp.api.models.identity.TicketingIdRequestDto;
 import com.automation.lac.qa.staffapp.api.models.ticketing.MockRedeemRequestV2;
 import com.automation.lac.qa.staffapp.api.models.ticketing.SeatRequest;
 import com.automation.lac.qa.staffapp.api.models.ticketing.TicketMasterUserIdRequest;
@@ -13,6 +19,24 @@ import lombok.experimental.UtilityClass;
 public class TicketingApiTask {
 
   /**
+   * Prepare ticketing mock service with valid fan parking ticket.
+   */
+  public static void assignValidParkingTicket() {
+    final GarageCategoryType garageCategory = getTestContext().get(GARAGE_CATEGORY);
+    String tmUserId;
+    IntuitDomeAccountDto account;
+    account = getTestContext().get(ADULT_INTUIT_DOME_ACCOUNT);
+    tmUserId = TicketingApiTask.generateTicketMasterUserId(account);
+    TicketingApiTask.addTicketingIdToIntuitDomAccount(account.getId(), tmUserId);
+    TicketingApiTask.setUpTicketingMockResponse(
+      tmUserId,
+      "SUCCESS",
+      "",
+      garageCategory.getParking(),
+      "MAIN_ACCESS");
+  }
+
+  /**
    * Setup mocked response of ticketing mock service.
    *
    * @param ticketingId   String indicating intuitDomeAccount ticketingId.
@@ -21,7 +45,7 @@ public class TicketingApiTask {
    * @param location      String indicating expected garage location.
    * @param ticketType    String indicating expected type of ticket.
    */
-  public void setUpTicketingMockResponse(String ticketingId,
+  public static void setUpTicketingMockResponse(String ticketingId,
                                                 String result,
                                                 String resultMessage,
                                                 String location,
@@ -56,7 +80,7 @@ public class TicketingApiTask {
    * @param intuitDomeAccount IntuitDomeAccountDto data.
    * @return String tmUserId value
    */
-  public String generateTicketMasterUserId(IntuitDomeAccountDto intuitDomeAccount) {
+  public static String generateTicketMasterUserId(IntuitDomeAccountDto intuitDomeAccount) {
 
     TicketMasterUserIdRequest request = TicketMasterUserIdRequest.builder()
       .email(intuitDomeAccount.getEmail())
@@ -72,5 +96,20 @@ public class TicketingApiTask {
       .zipCode(intuitDomeAccount.getZipcode())
       .build();
     return TicketingService.generateTicketMasterUserId(request).getTmUserId();
+  }
+
+  /**
+   * Add ticket mater id to an existing fan account.
+   *
+   * @param accountId      String indicating the id of fan account.
+   * @param ticketMasterId String indicating the ticket master id.
+   */
+  public static void addTicketingIdToIntuitDomAccount(String accountId, String ticketMasterId) {
+    TicketingIdRequestDto request =
+      TicketingIdRequestDto.builder()
+        .ticketingId(ticketMasterId)
+        .intuitDomeAccountId(accountId)
+        .build();
+    TicketingService.addTicketingIdToIntuitDomeAccount(request);
   }
 }

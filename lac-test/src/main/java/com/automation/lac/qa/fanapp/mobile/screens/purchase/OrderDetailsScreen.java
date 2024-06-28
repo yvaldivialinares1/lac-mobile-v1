@@ -32,11 +32,6 @@ public class OrderDetailsScreen extends MobileBaseScreen {
   @AndroidFindBy(xpath = "//android.widget.TextView[starts-with(@resource-id,'basicInfoText')]")
   private List<WebElement> additionalMessages;
 
-  @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[starts-with"
-    + "(@name,'garage_selection_available_garage_cta')]")
-  @AndroidFindBy(xpath = "//android.widget.TextView[starts-with(@resource-id,'tvGarageOption')]")
-  private List<WebElement> allAvailableGarages;
-
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[@name="
     + "'order_details_number_of_seats_label']")
   @AndroidFindBy(xpath = "(//android.widget.TextView[@resource-id='tvTotalSeatCount'])[1]")
@@ -87,15 +82,15 @@ public class OrderDetailsScreen extends MobileBaseScreen {
   private List<WebElement> totalSeatExpandButton;
 
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[starts-with(@name,"
-    + "'order_details_price_component_value_label_0')]")
+    + "'order_details_sub_total_label_0')]")
   @AndroidFindBy(xpath = "//android.widget.TextView[contains(@resource-id,"
-    + "'tvExpandCardPriceValue_0_')]")
+    + "'tvExpandCardSubtotal')]")
   private List<WebElement> seatPriceComponents;
 
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[contains(@name,"
     + "'order_details_price_component_value_label_0_subtotal')]")
   @AndroidFindBy(xpath = "//android.widget.TextView[@resource-id="
-    + "'tvExpandCardPriceValue_0_Subtotal']")
+    + "'tvExpandCardSubtotal0']")
   private WebElement seatSubtotalValue;
 
   @AndroidFindBy(xpath = "//android.widget.TextView[@resource-id='tvTotalTickets']")
@@ -107,7 +102,7 @@ public class OrderDetailsScreen extends MobileBaseScreen {
   private WebElement lblTotalCharges;
 
   @AndroidFindBy(xpath = "//android.view.View[@resource-id='btnGoToPay']")
-  @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[@name='seat_order_cta_title_label']")
+  @iOSXCUITFindBy(iOSNsPredicate = "name = 'seat_order_cta_title_label' AND type CONTAINS 'Button'")
   private WebElement btnGoToPay;
 
   @AndroidFindBy(xpath = "//android.view.View[@resource-id='tvSubTitle']")
@@ -133,5 +128,12 @@ public class OrderDetailsScreen extends MobileBaseScreen {
   @AndroidFindBy(xpath = "//android.widget.TextView[@content-desc='Delete button']")
   @iOSXCUITFindBy(accessibility = "order_details_delete_button")
   private WebElement btnDelete;
+
+  protected String getRowSectionDetails() {
+    if (isAndroid())
+      return "//android.widget.TextView[starts-with(@resource-id,'tvExpandCardSubTitle%s')]";
+    else return
+      "//XCUIElementTypeStaticText[starts-with(@name,'order_details_section_sub_title_label_%s')]";
+  }
 
 }

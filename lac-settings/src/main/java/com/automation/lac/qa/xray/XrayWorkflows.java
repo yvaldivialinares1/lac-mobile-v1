@@ -178,7 +178,7 @@ public class XrayWorkflows {
     try {
       return objectMapper.writer(filters).writeValueAsString(dtoTarget);
     } catch (JsonProcessingException e) {
-      throw new CustomException("Could not modify model\n" + e.getMessage());
+      throw new CustomException("Could not modify model.", e);
     }
   }
 

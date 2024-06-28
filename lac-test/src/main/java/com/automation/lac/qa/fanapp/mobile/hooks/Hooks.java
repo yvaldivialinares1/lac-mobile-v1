@@ -3,7 +3,7 @@ package com.automation.lac.qa.fanapp.mobile.hooks;
 import static com.automation.lac.qa.allure.AllureLogger.attachScreenShot;
 import static com.automation.lac.qa.browserstack.SessionService.addBrowserStackPublicLinks;
 import static com.automation.lac.qa.browserstack.SessionService.setBrowserStackStatus;
-import static com.automation.lac.qa.faker.AleatoryData.createRandomMiniAccounts;
+import static com.automation.lac.qa.faker.AleatoryData.createRandomTeammates;
 import static com.automation.lac.qa.faker.AleatoryData.createRandomVehicles;
 import static com.automation.lac.qa.fanapp.api.models.PaymentMethodFile.getActiveAndNotUsedPaymentMethods;
 import static com.automation.lac.qa.fanapp.mobile.enums.FanAppKeys.MINI_ACCOUNTS_INFO;
@@ -17,15 +17,17 @@ import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 
 import com.automation.lac.qa.assertions.SoftAssertManager;
 import com.automation.lac.qa.driver.Device;
+import com.automation.lac.qa.listener.TestListener;
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import com.automation.lac.qa.utils.TestContextManager;
 import io.cucumber.java.After;
-import io.cucumber.java.AfterStep;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import lombok.extern.slf4j.Slf4j;
+import org.testng.annotations.Listeners;
 
 @Slf4j
+@Listeners(TestListener.class)
 public class Hooks {
 
   /**
@@ -35,8 +37,11 @@ public class Hooks {
    * @param scenario The scenario currently being executed.
    */
   @Before(order = 0)
-  public void beforeScenario(Scenario scenario) {
+  public void initDriver(Scenario scenario) {
     log.info("Starting scenario: {}", scenario.getName());
+    getTestContext().set("tags", scenario.getSourceTagNames());
+    TestContextManager.getTestContext()
+      .set("ProjectName", scenario.getUri().getPath().split("features/")[1].split("/")[0]);
     TestContextManager.getTestContext().set("ScenarioName", scenario.getName());
     MobileBaseScreen.setDriver(Device.createAppiumDriver());
     getTestContext().set(SESSION_ID.name(), MobileBaseScreen.getDriver().getSessionId().toString());
@@ -52,41 +57,55 @@ public class Hooks {
   public void baseLoadData() {
     getTestContext().set(PAYMENT_METHODS.name(), getActiveAndNotUsedPaymentMethods());
     getTestContext().set(VEHICLES_INFO.name(), createRandomVehicles(5));
-    getTestContext().set(MINI_ACCOUNTS_INFO.name(), createRandomMiniAccounts(5));
-  }
-
-  /**
-   * Attaches a screenshot to the report if the current step fails.
-   *
-   * @param scenario The current Cucumber scenario.
-   */
-  @AfterStep
-  public void afterStep(Scenario scenario) {
-    if (scenario.isFailed()) {
-      attachScreenShot("screenShoot");
-    }
+    getTestContext().set(MINI_ACCOUNTS_INFO.name(), createRandomTeammates(5));
   }
 
   /**
    * Finalizes the test environment after each scenario execution.
-   * This includes asserting all soft assertions, logging the scenario's end,
-   * updating the BrowserStack status, adding BrowserStack public links, quitting the driver,
+   * This includes asserting all soft assertions, logging the scenario's end, quitting the driver,
    * and cleaning the test context.
    *
    * @param scenario The scenario that has just been executed.
    */
-  @After
-  public void afterScenario(Scenario scenario) {
+  @After(order = 1)
+  public void closeDriver(Scenario scenario) {
     stopRecording(scenario.getName());
-    SoftAssertManager.assertAll();
     log.info("Ending scenario: {}", scenario.getName());
     if (MobileBaseScreen.getDriver() != null) {
-      setBrowserStackStatus(MobileBaseScreen.getDriver(),
-        String.valueOf(scenario.getStatus()));
-      addBrowserStackPublicLinks(getTestContext().get(SESSION_ID.name()));
       MobileBaseScreen.getDriver().quit();
       MobileBaseScreen.removeDriver();
     }
     cleanTestContext();
+  }
+
+  /**
+   * Adds the BrowserStack public URL to the test report for the given scenario.
+   * This is useful when tests are run on BrowserStack and there is a need to provide
+   * a quick link to the test execution video or logs.
+   *
+   * @param scenario The Cucumber {@link Scenario} object representing the test scenario.
+   */
+  @After(order = 2)
+  public void addingBrowserStackPublicUrl(Scenario scenario) {
+    setBrowserStackStatus(MobileBaseScreen.getDriver(), String.valueOf(scenario.getStatus()));
+    addBrowserStackPublicLinks(getTestContext().get(SESSION_ID.name()));
+  }
+
+  @After(order = 3)
+  public void assertAll() {
+    SoftAssertManager.assertAll();
+  }
+
+  /**
+   * Attaches evidence to the report if the scenario has failed. This method can be used,
+   * for example, to take screenshots or gather logs when a test scenario fails.
+   *
+   * @param scenario The Cucumber {@link Scenario} object representing the test scenario.
+   */
+  @After(order = 4)
+  public void attachEvidenceIfScenarioFailed(Scenario scenario) {
+    if (scenario.isFailed()) {
+      attachScreenShot("screenShoot");
+    }
   }
 }

@@ -1,14 +1,11 @@
 package com.automation.lac.qa.staffapp.mobile.tasks.welcome;
 
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
-import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementVisibility;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitUntilAlertIsVisible;
 
 import com.automation.lac.qa.staffapp.mobile.screens.welcome.WelcomeScreen;
-import com.automation.lac.qa.staffapp.mobile.screens.welcome.components.WelcomePopupScreen;
 
 public class WelcomeTask extends WelcomeScreen {
-
-  protected WelcomePopupScreen welcomePopupScreen = new WelcomePopupScreen();
 
   /**
    * tap 'login' button.
@@ -22,9 +19,7 @@ public class WelcomeTask extends WelcomeScreen {
    * tap 'Allow' button if displayed.
    */
   public WelcomeTask clickAllowButtonIfDisplayed() {
-    if (waitForElementVisibility(welcomePopupScreen.getBtnAllow(), 5)) {
-      click(welcomePopupScreen.getBtnAllow(), "Allow");
-    }
+    waitUntilAlertIsVisible(5).accept();
     return this;
   }
 
@@ -32,6 +27,6 @@ public class WelcomeTask extends WelcomeScreen {
    * tap 'Continue' button.
    */
   public void clickContinueButton() {
-    click(welcomePopupScreen.getBtnContinue(), "Continue");
+    waitUntilAlertIsVisible(5).accept();
   }
 }

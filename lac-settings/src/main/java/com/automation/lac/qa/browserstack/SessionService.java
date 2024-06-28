@@ -4,7 +4,7 @@ import static com.automation.lac.qa.browserstack.enums.BrowserStackData.BS_API_C
 import static com.automation.lac.qa.browserstack.enums.BrowserStackData.BS_SESSIONS;
 import static com.automation.lac.qa.driver.AppiumConstants.BS_ACCESS_KEY;
 import static com.automation.lac.qa.driver.AppiumConstants.BS_USER_NAME;
-import static com.automation.lac.qa.driver.AppiumConstants.mobileApp;
+import static com.automation.lac.qa.driver.AppiumConstants.MOBILE_APP;
 import static io.restassured.http.ContentType.JSON;
 
 import com.automation.lac.qa.driver.AppiumConstants;
@@ -44,7 +44,7 @@ public class SessionService {
    * @param sessionId The session ID for the current BrowserStack session.
    */
   public static void addBrowserStackPublicLinks(String sessionId) {
-    if (mobileApp.endsWith("Lts")) {
+    if (MOBILE_APP.endsWith("Lts")) {
       JsonNode session = SessionService.getSessionDetails(sessionId);
       Allure.addAttachment("BrowserStack Public URL:",
         session.get("automation_session").get("public_url").asText());
@@ -60,7 +60,7 @@ public class SessionService {
    * @param status The test status ("PASSED" or "FAILED").
    */
   public static synchronized void setBrowserStackStatus(AppiumDriver driver, String status) {
-    if (mobileApp.endsWith("Lts")) {
+    if (MOBILE_APP.endsWith("Lts")) {
       JSONObject executorObject = new JSONObject();
       JSONObject argumentsObject = new JSONObject();
       if (status.equals("PASSED")) {
@@ -84,11 +84,11 @@ public class SessionService {
    * @throws CustomException If required properties are missing.
    */
   public static String getHubUrl() {
-    if (mobileApp.endsWith("Lts")) {
+    if (MOBILE_APP.endsWith("Lts")) {
       if (AppiumConstants.HUB_URL.isEmpty() || AppiumConstants.HUB_URL.isBlank()) {
         throw new CustomException("framework.mobile.hub.url is NULL or Empty");
       }
-      if (mobileApp.endsWith("Lts")) {
+      if (MOBILE_APP.endsWith("Lts")) {
         assert BS_USER_NAME != null;
         if ((BS_USER_NAME.isEmpty() || BS_USER_NAME.isBlank())) {
           assert BS_ACCESS_KEY != null;

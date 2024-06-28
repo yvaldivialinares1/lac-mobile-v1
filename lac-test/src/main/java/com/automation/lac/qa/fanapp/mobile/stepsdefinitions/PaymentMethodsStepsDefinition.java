@@ -29,7 +29,7 @@ public class PaymentMethodsStepsDefinition {
   @And("the user skip the payment method registration")
   public void theUserSkipThePaymentMethodRegistration() {
     addPaymentMethodEducationalTask.skipAddPaymentMethodEducationalScreen();
-    getTestContext().set(IS_CARD_ADDED.name(), "false");
+    getTestContext().set(IS_CARD_ADDED.name(), false);
   }
 
   @And("the user select payment method management from menu")
@@ -37,9 +37,9 @@ public class PaymentMethodsStepsDefinition {
     myPaymentsTask.clickOnPaymentMethodsManagement();
   }
 
-  @And("the user uses an existing payment method")
-  public void theUserSelectsExistingPaymentMethod() {
-    checkOutScreenQuestions.validateExistingPaymentCardInCheckoutScreen();
+  @And("^the user uses an existing payment method in (share payment method|checkout) screen")
+  public void theUserSelectsExistingPaymentMethod(String screen) {
+    checkOutScreenQuestions.validateExistingPaymentCard(screen);
   }
 
   /**
@@ -78,13 +78,17 @@ public class PaymentMethodsStepsDefinition {
    */
   @And("the user completes the payment method registration")
   public void theUserCompletesThePaymentMethodRegistration() {
-    addPaymentMethodEducationalTask.clickAddPaymentMethod();
-    addPaymentMethodTask.addValidCard();
-    getTestContext().set(IS_CARD_ADDED.name(), "true");
+    addPaymentMethodEducationalTask.clickAddPaymentMethod().addValidCard();
+    getTestContext().set(IS_CARD_ADDED.name(), true);
   }
 
   @And("the user navigates to my profile from My payment methods")
   public void theUserNavigatesToMyProfileFromMyPaymentMethods() {
     myPaymentsMethodTask.goToMyProfileFromMyPayments();
+  }
+
+  @And("the user select share your payment methods from menu")
+  public void theUserSelectShareYourPaymentMethodsFromMenu() {
+    myPaymentsTask.clickOnShareYourPaymentMethods();
   }
 }

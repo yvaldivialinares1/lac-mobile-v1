@@ -1,8 +1,6 @@
 package com.automation.lac.qa.staffapp.mobile.tasks.access;
 
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
-import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementAvailability;
-import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementUnavailability;
 
 import com.automation.lac.qa.staffapp.mobile.screens.access.QueueIssuesScreen;
 import com.automation.lac.qa.staffapp.mobile.screens.access.components.EventCardComponent;
@@ -10,19 +8,13 @@ import com.automation.lac.qa.utils.CustomException;
 
 public class QueueIssuesTask extends QueueIssuesScreen {
 
+  private static final String LABEL = "label";
+
   /**
    * open 'Select Lanes' sidebar panel
    */
   public void clickSelectLinesButton() {
-    click(getBtnSelectLanes(), "SELECT LANES");
-  }
-
-  /**
-   * wait while spinner indicator is displayed
-   */
-  public void waitForSpinnerDisappear() {
-    waitForElementAvailability(getProgressBarIcon(), 5);
-    waitForElementUnavailability(getProgressBarIcon(), 60);
+    click(getBtnSelectLanes(), "select lines");
   }
 
   /**
@@ -33,7 +25,7 @@ public class QueueIssuesTask extends QueueIssuesScreen {
    */
   public EventCardComponent getEventCardById(String deviceId) {
     return getEventCardList().stream()
-      .filter(card -> card.getIssueCardDeviceId().getAttribute("label").equals(deviceId))
+      .filter(card -> card.getIssueCardDeviceId().getAttribute(LABEL).equals(deviceId))
       .findFirst()
       .orElseThrow(() -> new CustomException("No event card found with device id as: " + deviceId));
   }
@@ -47,9 +39,31 @@ public class QueueIssuesTask extends QueueIssuesScreen {
   public EventCardComponent getEventCardByLicencePlate(String licencePlate) {
     return getEventCardList().stream()
       .filter(
-        card -> card.getIssueCardPlateValues().get(0).getAttribute("label").equals(licencePlate))
+        card -> card.getIssueCardPlateValues().get(0).getAttribute(LABEL).equals(licencePlate))
       .findFirst()
       .orElseThrow(
         () -> new CustomException("No event card found with device id as: " + licencePlate));
+  }
+
+  /**
+   * identify event card by device id and tap primary button.
+   *
+   * @param deviceId id of the device.
+   * @return QueueIssuesTask
+   */
+  public QueueIssuesTask tapEventCardPrimaryButton(String deviceId) {
+    EventCardComponent eventCard = getEventCardById(deviceId);
+    final String label = eventCard.getBtnPrimary().getAttribute(LABEL);
+    click(eventCard.getBtnPrimary(), label);
+    return this;
+  }
+
+  /**
+   * extract the banner message text.
+   *
+   * @return String text value of banner message
+   */
+  public String getBannerMessageText() {
+    return getBannerMessageComponent().getBannerMessageText();
   }
 }

@@ -9,21 +9,18 @@ import org.openqa.selenium.WebElement;
 @Getter
 public class SuggestedSeatComponent extends Widget {
 
-  @AndroidFindBy(xpath = "./*[@resource-id='seatSelectionSeatInfoLabel']")
+  @AndroidFindBy(uiAutomator = "resourceId(\"seatSelectionSeatInfoLabel\")")
   @iOSXCUITFindBy(xpath = "./XCUIElementTypeStaticText[1]")
   private WebElement sectionSeatTitle;
 
-  @AndroidFindBy(xpath = ".//*[@resource-id='seatSelectionSeatStdSeatLabel']]")
-  private WebElement sectionSeatLabel;
-
-  @AndroidFindBy(xpath = ".//*[@resource-id='seatSelectionSeatPlace']")
+  @AndroidFindBy(xpath = "//*[@resource-id='seatSelectionSeatInfoInfo']/android.view.View[1]")
   @iOSXCUITFindBy(xpath = "./XCUIElementTypeOther[1]/XCUIElementTypeStaticText")
-  private WebElement sectionSeatPlace;
+  private WebElement sectionSeatInfo;
 
-  @AndroidFindBy(xpath = ".//*[@resource-id='seatSelectionTicketInfoText']")
+  @AndroidFindBy(uiAutomator = "resourceId(\"seatSelectionTicketInfoText\")")
   private WebElement sectionSeatCount;
 
-  @AndroidFindBy(xpath = ".//*[@resource-id='seatSelectionTicketInfoAmount']")
+  @AndroidFindBy(uiAutomator = "resourceId(\"seatSelectionTicketInfoAmount\")")
   @iOSXCUITFindBy(xpath = "./XCUIElementTypeStaticText[2]")
   private WebElement sectionSeatPrice;
 

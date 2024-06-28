@@ -1,10 +1,10 @@
 package com.automation.lac.qa.fanapp.mobile.screens.home;
 
+import com.automation.lac.qa.fanapp.mobile.screens.home.components.MenuWidget;
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import lombok.Getter;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 @Getter
@@ -38,17 +38,7 @@ public class HomeScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(accessibility = "navigation_menu_closed")
   private WebElement btnMenu;
 
-  /**
-   * @param menuItem menu item to be fetched
-   * @return WebElement of the specified menu item
-   */
-  public WebElement getMenuButton(String menuItem) {
-    menuItem = menuItem.toUpperCase();
-    if (isAndroid())
-      return getDriver().findElement(
-        By.xpath(String.format("//android.view.View[@content-desc='%sButton']", menuItem)));
-    else
-      return getDriver().findElement(By.xpath(
-        String.format("//*[contains(@name,'navigation_menu_option')][@label='%s']", menuItem)));
-  }
+  @AndroidFindBy(xpath = "//android.view.View[@content-desc='Close Menu Button']/..")
+  @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='navigation_menu_opened']/..")
+  private MenuWidget menuWidget;
 }

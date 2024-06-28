@@ -10,23 +10,25 @@ import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.hideKeyboard;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.sendKeys;
+import static com.automation.lac.qa.utils.mobile.SwipeActions.swipeUntilFindElement;
+import static com.automation.lac.qa.utils.mobile.SwipeDirections.DOWN_TO_UP;
 
 import com.automation.lac.qa.faker.models.UserInfo;
 import com.automation.lac.qa.faker.models.userinfo.AccountInfo;
 import com.automation.lac.qa.fanapp.mobile.screens.identitycreateanaccount.SetPasswordScreen;
+import io.qameta.allure.Step;
 
 public class SetPasswordTask extends SetPasswordScreen {
-
-  private final UserInfo userInfo = getTestContext().get(USER_INFO.name());
 
   /**
    * Sets a new password by completing the set password and
    * confirm password fields, and then confirms the account
    * by clicking on the "Confirm My Account" button.
    */
+  @Step("Complete the Password")
   public void setAPassword() {
-    completeConfirmAPassword();
     completeSetAPassword();
+    completeConfirmAPassword();
     click(getBtnConfirmMyAccount(), CONFIRM_MY_ACCOUNT.getValue());
   }
 
@@ -34,7 +36,7 @@ public class SetPasswordTask extends SetPasswordScreen {
    * Enters the new password into the 'set a password' input field.
    */
   public void completeSetAPassword() {
-    AccountInfo accountInfo = userInfo.getAccountInfo();
+    AccountInfo accountInfo = ((UserInfo) getTestContext().get(USER_INFO.name())).getAccountInfo();
     click(getBtnShowSetAPassword(), SHOW_SET_PASSWORD.getValue());
     sendKeys(getInputSetAPassword(), accountInfo.getPassword(), SET_PASSWORD.getValue());
     hideKeyboard("done");
@@ -44,10 +46,13 @@ public class SetPasswordTask extends SetPasswordScreen {
    * Enters the new password into the 'confirm a password' input field.
    */
   public void completeConfirmAPassword() {
-    AccountInfo accountInfo = userInfo.getAccountInfo();
+    AccountInfo accountInfo = ((UserInfo) getTestContext().get(USER_INFO.name())).getAccountInfo();
     click(getBtnShowConfirmPassword(), SHOW_CONFIRM_PASSWORD.getValue());
-    sendKeys(getInputConfirmPassword(), accountInfo.getConfirmPassword(),
-      CONFIRM_PASSWORD.getValue());
+    sendKeys(getInputConfirmPassword(), accountInfo.getPassword(), CONFIRM_PASSWORD.getValue());
     hideKeyboard("done");
+  }
+
+  public void swipeToPasswordFields() {
+    swipeUntilFindElement(getInputHiddenConfirmPassword(), DOWN_TO_UP);
   }
 }

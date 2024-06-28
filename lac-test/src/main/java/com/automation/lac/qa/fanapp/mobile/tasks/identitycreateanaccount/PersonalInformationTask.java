@@ -1,72 +1,50 @@
 package com.automation.lac.qa.fanapp.mobile.tasks.identitycreateanaccount;
 
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.CONFIRM;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.CONTINUE;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.CURRENT_SELECTION_DATE;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.DATE_OF_BIRTH;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.DATE_PICKER;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.HIDE_YEAR_PICKER;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.NEXT_MONTH;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.PERSONAL_INFORMATION;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.POPOVER_DISMISS_CALENDAR;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.PREVIOUS_MONTH;
 import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.COUNTRY_CODE;
-import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.DAY;
 import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.FIRST_NAME;
 import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.LAST_NAME;
-import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.MONTH;
 import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.PHONE_NUMBER;
 import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.SEARCH;
-import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.YEAR;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.APRIL;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.AUGUST;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.DECEMBER;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.FEBRUARY;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.JANUARY;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.JULY;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.JUNE;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.MARCH;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.MAY;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.NOVEMBER;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.OCTOBER;
-import static com.automation.lac.qa.fanapp.mobile.enums.Month.SEPTEMBER;
-import static com.automation.lac.qa.fanapp.mobile.utils.DeviceActions.getElement;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
-import static com.automation.lac.qa.utils.mobile.DeviceActions.hideKeyboard;
+import static com.automation.lac.qa.utils.mobile.DeviceActions.getTextFromElement;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.sendKeys;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.specialIosSetText;
-import static com.automation.lac.qa.utils.mobile.SwipeActions.swipeUntilFindElement;
-import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementAvailability;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitElementWillBeAvailable;
 
 import com.automation.lac.qa.faker.models.userinfo.PersonalInfo;
 import com.automation.lac.qa.fanapp.mobile.screens.identitycreateanaccount.PersonalInformationScreen;
-import com.automation.lac.qa.utils.mobile.SwipeDirections;
+import com.automation.lac.qa.fanapp.mobile.tasks.commons.CalendarTask;
+import io.qameta.allure.Step;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.By;
 
 @Slf4j
 public class PersonalInformationTask extends PersonalInformationScreen {
 
+  private final CalendarTask calendarTask = new CalendarTask();
+
   /**
    * Complete all the Personal Information
+   *
+   * @param personalInfo user personal info
    */
+  @Step("Complete the personal information")
   public void completePersonalInformation(PersonalInfo personalInfo) {
     enterMandatoryFields(personalInfo);
-    if (!isAndroid()) {
-      hideKeyboard(null);
-    }
     click(getBtnContinue(), CONTINUE.getValue());
   }
+
 
   /**
    * Enters mandatory fields for personal information
    */
   public void enterMandatoryFields(PersonalInfo personalInfo) {
     completeFullName(personalInfo.getFirstName(), personalInfo.getLastName());
-    completeDateOfBirth(personalInfo);
+    completeDateOfBirth(personalInfo.getBirthDate());
     completeCountryCode(personalInfo.getPhoneOtpCountry());
     completePhoneNumber(personalInfo.getPhoneNumber());
   }
@@ -79,8 +57,8 @@ public class PersonalInformationTask extends PersonalInformationScreen {
       sendKeys(getInputFirstName(), firstName, FIRST_NAME.getValue());
       sendKeys(getInputLastName(), lastName, LAST_NAME.getValue());
     } else {
-      specialIosSetText(getInputFirstName(), firstName, FIRST_NAME.getValue());
-      specialIosSetText(getInputLastName(), lastName, LAST_NAME.getValue());
+      specialIosSetText(getInputFirstName(), firstName, FIRST_NAME.getValue(), false);
+      specialIosSetText(getInputLastName(), lastName, LAST_NAME.getValue(), false);
     }
   }
 
@@ -90,19 +68,15 @@ public class PersonalInformationTask extends PersonalInformationScreen {
    * On Android platform, clicks on the Confirm button; on iOS platform,
    * clicks on the Hide Calendar button
    */
-  public void completeDateOfBirth(PersonalInfo personalInfo) {
-    log.info("Date of Birth: {}", personalInfo.getBirthDate());
-    String month = personalInfo.getBirthDate().getMonth().toString();
-    String day = String.valueOf(personalInfo.getBirthDate().getDayOfMonth());
-    String year = String.valueOf(personalInfo.getBirthDate().getYear());
-    selectDateOfBirth(month, day, year);
+  @Step("Select the date of birth {birthDate}")
+  public void completeDateOfBirth(LocalDate birthDate) {
+    String currentSelectedDate = getTextFromElement(getInputDateOfBirth(), "value");
 
-    if (isAndroid()) {
-      click(getBtnConfirm(), CONFIRM.getValue());
-    } else {
-      click(getBtnPopoverDismissCalendar(), POPOVER_DISMISS_CALENDAR.getValue());
+    while (currentSelectedDate.isEmpty() || currentSelectedDate.contains("2024")) {
+      click(getInputDateOfBirth(), DATE_OF_BIRTH.getValue());
+      calendarTask.selectDate(birthDate);
+      currentSelectedDate = getTextFromElement(getInputDateOfBirth(), "value");
     }
-    hideKeyboard(null);
   }
 
   /**
@@ -110,7 +84,7 @@ public class PersonalInformationTask extends PersonalInformationScreen {
    */
   public void completeCountryCode(String countryCode) {
     click(getInputCountryCode(), COUNTRY_CODE.getValue());
-    waitForElementAvailability(getInputSearch(), 10);
+    waitElementWillBeAvailable(getInputSearch(), 10);
     click(getInputSearch(), SEARCH.getValue());
     String formattedCountry = StringUtils.capitalize(countryCode);
     sendKeys(getInputSearch(), formattedCountry, SEARCH.getValue());
@@ -125,99 +99,25 @@ public class PersonalInformationTask extends PersonalInformationScreen {
     if (isAndroid()) {
       sendKeys(getInputPhoneNumber(), phoneNumber, PHONE_NUMBER.getValue());
     } else {
-      specialIosSetText(getInputPhoneNumber(), phoneNumber, PHONE_NUMBER.getValue());
+      specialIosSetText(getInputPhoneNumber(), phoneNumber, PHONE_NUMBER.getValue(), true);
       click(getLblPersonalInformation(), PERSONAL_INFORMATION.getValue());
     }
   }
 
-  /**
-   * Selects the date of birth with the provided month, day, and year
-   */
-  public void selectDateOfBirth(String month, String day, String year) {
-    click(getInputDateOfBirth(), DATE_OF_BIRTH.getValue());
-    month = StringUtils.capitalize(month.toLowerCase());
-    if (isAndroid()) {
-      setDateOfBirthAndroid(month, day, year);
-    } else {
-      setDateOfBirthIos(month, day, year);
-    }
+  public void clickContinue() {
+    click(getBtnContinue(), CONTINUE.getValue());
   }
 
   /**
-   * Sets the date of birth on an Android device by selecting the month, day, and year.
+   * Manages the personal information section during the NBA account registration process.
+   * This method fills in the phone number using the provided personal information
+   * and clicks the "Continue" button to proceed to the address information step.
    *
-   * @param month The month to set for the date of birth.
-   * @param day   The day to set for the date of birth.
-   * @param year  The year to set for the date of birth.
+   * @param personalInfo PersonalInfo object containing the user's personal details,
+   *                     including the phone number to be completed in the form.
    */
-  public void setDateOfBirthAndroid(String month, String day, String year) {
-    int i = 0;
-    String monthToSelect = calculateMonthDistance(month);
-    while (getTxtCurrentSelectionDate().isDisplayed()
-      && !getTxtCurrentSelectionDate().getText().contains(month) && i < 12) {
-      if (monthToSelect.equals("Next")) {
-        click(getBtnNextMonth(), NEXT_MONTH.getValue());
-      } else if (monthToSelect.equals("Previous")) {
-        click(getBtnPreviousMonth(), PREVIOUS_MONTH.getValue());
-      }
-      i++;
-    }
-    click(getDatePickerYear(), DATE_PICKER.getValue());
-    String yearXpath = String.format(YEAR_XPATH_ANDROID, year);
-    swipeUntilFindElement(yearXpath, SwipeDirections.UP_TO_DOWN, getNavigateToYearArea());
-    click(getDriver().findElement(By.xpath(yearXpath)), year);
-
-    String dayToSearch = month.concat(" ").concat(day).concat(", ").concat(year);
-    String dayXpathToSearch = String.format(DAY_XPATH_ANDROID, dayToSearch);
-    click(getElement(By.xpath(dayXpathToSearch)), dayToSearch);
-  }
-
-  /**
-   * Set date of birth for iOS
-   *
-   * @param month month of birth
-   * @param day   day of birth
-   * @param year  year of birth
-   */
-  public void setDateOfBirthIos(String month, String day, String year) {
-    String defaultDate = getTxtCurrentSelectionDate().getAttribute("value");
-    click(getTxtCurrentSelectionDate(), CURRENT_SELECTION_DATE.getValue());
-    sendKeys(getYearIos(defaultDate), year, YEAR.getValue());
-    sendKeys(getMonthIos(defaultDate), month, MONTH.getValue());
-    click(getHideYearPicker(), HIDE_YEAR_PICKER.getValue());
-    click(getDayIos(String.format("%s %s", month, day)), DAY.getValue());
-  }
-
-  /**
-   * Decides which is the shortest path to expected month based on actual month
-   *
-   * @param month String
-   * @return path
-   */
-  private String calculateMonthDistance(String month) {
-    LocalDate currentDate = LocalDate.now();
-    List<String> months = List.of(
-      JANUARY.getDescription(), FEBRUARY.getDescription(), MARCH.getDescription(),
-      APRIL.getDescription(), MAY.getDescription(), JUNE.getDescription(),
-      JULY.getDescription(), AUGUST.getDescription(), SEPTEMBER.getDescription(),
-      OCTOBER.getDescription(), NOVEMBER.getDescription(), DECEMBER.getDescription()
-    );
-
-    String currentMonth = StringUtils.capitalize(currentDate.getMonth().name().toLowerCase());
-
-    if (month.equals(currentMonth)) {
-      return "Actual";
-    } else {
-      int startIndex = months.indexOf(currentMonth);
-      int targetIndex = months.indexOf(month);
-      int counterNext = (startIndex - targetIndex + 12) % 12;
-      int countPrevious = (targetIndex - startIndex + 12) % 12;
-
-      if (counterNext > countPrevious) {
-        return "Next";
-      } else {
-        return "Previous";
-      }
-    }
+  public void managePersonalInformationNbaAccount(PersonalInfo personalInfo) {
+    completePhoneNumber(personalInfo.getPhoneNumber());
+    clickContinue();
   }
 }

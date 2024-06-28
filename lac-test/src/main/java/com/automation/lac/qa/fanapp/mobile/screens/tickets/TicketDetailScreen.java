@@ -205,9 +205,13 @@ public class TicketDetailScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@name='banner_message_view']")
   private WebElement maximumAllowedSeatCountBannerCloseButton;
 
-  @AndroidFindBy(xpath = "//*[@resource-id='btFindTickets']")
+  @AndroidFindBy(id = "btFindTickets")
   @iOSXCUITFindBy(accessibility = "game_details_cta_title_label")
-  private WebElement btnFindTicketsGame;
+  private WebElement btnFindSeats;
+
+  @AndroidFindBy(id = "btFindTickets")
+  @iOSXCUITFindBy(iOSNsPredicate = "name BEGINSWITH 'Find tickets button'")
+  private WebElement btnFindTickets;
 
   @AndroidFindBy(xpath = "//*[@resource-id='tvMaxTickets']")
   @iOSXCUITFindBy(accessibility = "game_details_maximum_allowed_label")
@@ -250,10 +254,6 @@ public class TicketDetailScreen extends MobileBaseScreen {
   @AndroidFindBy(xpath = "//*[@resource-id='ivBannerGameDetail']")
   @iOSXCUITFindBy(accessibility = "navigation_bar_title_label")
   private WebElement eventTitle;
-
-  @AndroidFindBy(xpath = "//*[@resource-id='btFindTickets']")
-  @iOSXCUITFindBy(accessibility = "event_details_cta_title_label")
-  private WebElement btnFindTicketsEvent;
 
   @AndroidFindBy(xpath = "//*[contains(@resource-id,'boxEventTicket')][contains(@text,'sold out')]")
   @iOSXCUITFindBy(xpath = "//*[contains(@name,'ticket_list_row')]"

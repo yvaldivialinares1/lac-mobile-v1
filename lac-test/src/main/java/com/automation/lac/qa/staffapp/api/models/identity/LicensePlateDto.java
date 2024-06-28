@@ -20,4 +20,5 @@ public class LicensePlateDto {
   private String make;
   private String model;
   private String color;
+  private String memberType;
 }

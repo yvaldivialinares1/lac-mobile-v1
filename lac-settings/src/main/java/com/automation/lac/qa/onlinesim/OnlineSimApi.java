@@ -3,17 +3,22 @@ package com.automation.lac.qa.onlinesim;
 import static com.automation.lac.qa.onlinesim.enums.OnlineSimStaticData.ONLINE_SIM_BASE_URI;
 import static com.automation.lac.qa.onlinesim.enums.OnlineSimStaticData.ONLINE_SIM_COUNTRY;
 import static com.automation.lac.qa.onlinesim.enums.OnlineSimStaticData.ONLINE_SIM_NUMBER;
+import static com.automation.lac.qa.utils.mobile.WaitActions.createFluentWait;
 import static org.apache.http.HttpStatus.SC_OK;
 
 import com.automation.lac.qa.onlinesim.models.OnlineSimResponse;
 import com.automation.lac.qa.onlinesim.models.OnlineSimResponse.Message;
 import com.automation.lac.qa.onlinesim.models.OnlineSimResponse.NumberInfo;
+import com.automation.lac.qa.pages.MobileBaseScreen;
 import com.automation.lac.qa.rest.Request;
 import com.automation.lac.qa.rest.Response;
 import com.automation.lac.qa.utils.CustomException;
+import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,13 +43,13 @@ public class OnlineSimApi {
   /**
    * Fluent wait instance for managing polling and timeouts during asynchronous operations.
    */
-  private static final FluentWait<Object> WAIT = new FluentWait<>(new Object())
-    .withTimeout(Duration.ofMinutes(2))
-    .pollingEvery(Duration.ofSeconds(5))
-    .ignoring(NoSuchElementException.class);
+  private static final FluentWait<Object> WAIT =
+    createFluentWait(MobileBaseScreen.getDriver(), Duration.ofMinutes(1), Duration.ofSeconds(5),
+      "Was impossible to get the phone number OTP", NoSuchElementException.class);
 
   /**
    * Retrieves a list of available numbers by country names from the OnlineSim service.
+   * Only return the list numbers when it received messages in the last 2 hours
    *
    * @param countryNames Varargs parameter that represents the names of countries to retrieve
    *                     numbers for.
@@ -53,15 +58,15 @@ public class OnlineSimApi {
    *                         exceptions occur.
    */
   @SneakyThrows
+  @Step("GET - /api/getFreeList")
   public static List<NumberInfo> getAvailableNumbersByCountry(List<String> countryNames) {
-
-    Response response = new Request()
-      .baseUri(ONLINE_SIM_BASE_URI.getText())
-      .contentType(ContentType.JSON)
-      .get();
-
-    Assert.assertEquals(response.getResponse().statusCode(), SC_OK,
-      "Unexpected OnlineSim response");
+    Response response = WAIT.until(onlineServiceApi -> {
+      Response service = new Request()
+        .baseUri(ONLINE_SIM_BASE_URI.getText())
+        .contentType(ContentType.JSON)
+        .get();
+      return (service.getResponse().statusCode() != SC_OK) ? null : service;
+    });
 
     OnlineSimResponse onlineSimResponse = response.getResponse().as(OnlineSimResponse.class);
 
@@ -78,7 +83,13 @@ public class OnlineSimApi {
       OnlineSimResponse result = responseCountry.getResponse().as(OnlineSimResponse.class);
       List<NumberInfo> numbersByCountry =
         new ArrayList<>(result.getNumbers().values());
-      availableNumbers.addAll(numbersByCountry);
+      LocalDateTime lastMessage =
+        LocalDateTime.parse(result.getMessages().getData().get(0).getCreatedAt(),
+          DATE_TIME_FORMATTER);
+      LocalDateTime utcNow = LocalDateTime.ofInstant(Instant.now(), ZoneId.of("UTC+3"));
+      Duration duration = Duration.between(lastMessage, utcNow);
+      if (duration.toHours() < 2)
+        availableNumbers.addAll(numbersByCountry);
     });
 
     if (!availableNumbers.isEmpty()) {
@@ -86,25 +97,6 @@ public class OnlineSimApi {
     } else {
       throw new CustomException("No available numbers for given countries");
     }
-  }
-
-  /**
-   * Get the last message date.
-   *
-   * @param countryCode The country code part of the full number.
-   * @param phoneNumber The phone number to use in the API call.
-   * @param senderCode  The OTP code sender.
-   * @return The last message's date.
-   */
-  public static LocalDateTime getLastOtpMessageDate(String countryCode, String phoneNumber,
-                                                    String senderCode) {
-    Message latestMessage =
-      getLastMessageByInNumber(
-        fetchOnlineSimResponse(countryCode, phoneNumber).getMessages().getData(),
-        senderCode);
-
-    return LocalDateTime.parse(latestMessage != null ? latestMessage.getCreatedAt() :
-      LocalDateTime.now().format(DATE_TIME_FORMATTER), DATE_TIME_FORMATTER);
   }
 
   /**
@@ -123,10 +115,11 @@ public class OnlineSimApi {
 
       List<Message> filterMessages = response.getMessages().getData().stream()
         .filter(message -> message.getText().contains("IntuitDome")
-          && LocalDateTime.parse(message.getCreatedAt().replace(" ", "T")).isAfter(initialDateTime))
-        .toList();
+          || message.getText().contains("INTUIT DOME")
+          && isMessageAfter(message, initialDateTime)).toList();
 
-      log.info("OTP number(s) {} from number {}", filterMessages, countryCode + phoneNumber);
+      if (filterMessages.isEmpty()) log.warn("OTP number(s) is empty");
+      else log.info("OTP number(s) {} from number {}", filterMessages, countryCode + phoneNumber);
       return filterMessages.isEmpty() ? null : filterMessages;
     });
   }
@@ -161,6 +154,7 @@ public class OnlineSimApi {
    * @return An {@link OnlineSimResponse} object with the response data.
    * @throws AssertionError if the response status code is not OK.
    */
+  @Step("GET - /api/getFreeList?country={countryCode}&number={number}")
   private static OnlineSimResponse fetchOnlineSimResponse(String countryCode, String number) {
     Response response = new Request()
       .baseUri(ONLINE_SIM_BASE_URI.getText())
@@ -191,4 +185,27 @@ public class OnlineSimApi {
       .map(OnlineSimResponse.Country::getCountryCode).toList();
   }
 
+  /**
+   * Checks if a message's creation time is after a provided {@link LocalDateTime}.
+   *
+   * @param message  The {@link Message} to check.
+   * @param dateTime The {@link LocalDateTime} to compare the message's creation time against.
+   * @return true if the message was created after the provided dateTime, false otherwise.
+   */
+  private static boolean isMessageAfter(Message message, LocalDateTime dateTime) {
+    return LocalDateTime.parse(message.getCreatedAt(), DATE_TIME_FORMATTER).isAfter(dateTime);
+  }
+
+  /**
+   * Retrieves the most recent date and time from a list of messages.
+   *
+   * @param messages the list of messages with creation timestamps
+   * @return the latest {@code LocalDateTime} found, or {@code LocalDateTime.MIN} if list is empty
+   */
+  public static LocalDateTime mostRecentDateTime(List<Message> messages) {
+    return messages.stream()
+      .map(message -> LocalDateTime.parse(message.getCreatedAt(), DATE_TIME_FORMATTER))
+      .max(Comparator.naturalOrder())
+      .orElse(LocalDateTime.MIN);
+  }
 }

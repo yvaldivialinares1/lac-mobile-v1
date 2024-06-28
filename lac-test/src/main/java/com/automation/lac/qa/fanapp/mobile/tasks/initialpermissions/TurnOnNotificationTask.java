@@ -6,9 +6,10 @@ import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.CONTI
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.WHILE_USING_APP;
 import static com.automation.lac.qa.utils.mobile.AlertActions.tapIosAlertOption;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
+import static com.automation.lac.qa.utils.mobile.WaitActions.isTheElementVisible;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementVisibility;
 
 import com.automation.lac.qa.fanapp.mobile.screens.initialpermissions.TurnOnNotificationScreen;
-import com.automation.lac.qa.utils.mobile.WaitActions;
 
 public class TurnOnNotificationTask extends TurnOnNotificationScreen {
 
@@ -16,14 +17,29 @@ public class TurnOnNotificationTask extends TurnOnNotificationScreen {
    * Perform all the necessary steps for granting of Permissions to FanApp
    */
   public void grantLacPermission() {
+    waitForElementVisibility(getBtnContinue(), 20);
     click(getBtnContinue(), CONTINUE.getValue());
+    turnOnNotifications();
+    click(getBtnContinue(), CONTINUE.getValue());
+    enableLocation();
+  }
+
+  /**
+   * Turn on notifications
+   */
+  public void turnOnNotifications() {
     if (isAndroid()) {
-      if (WaitActions.waitForElementVisibility(getAllowNotificationComponent().getBtnAllow(), 5))
-        click(getAllowNotificationComponent().getBtnAllow(), ALLOW.getValue());
+      if (isTheElementVisible(getAllowNotificationsComponent().getBtnAllow(), 5))
+        click(getAllowNotificationsComponent().getBtnAllow(), ALLOW.getValue());
     } else {
       tapIosAlertOption(ALLOW.getValue());
     }
-    click(getBtnContinue(), CONTINUE.getValue());
+  }
+
+  /**
+   * Enable location
+   */
+  public void enableLocation() {
     if (isAndroid()) {
       click(getEnableLocationComponent().getBtnWhileUsingTheApp(), WHILE_USING_APP.getValue());
     } else {

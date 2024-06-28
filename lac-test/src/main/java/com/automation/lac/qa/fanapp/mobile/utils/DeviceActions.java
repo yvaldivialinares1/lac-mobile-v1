@@ -1,37 +1,23 @@
 package com.automation.lac.qa.fanapp.mobile.utils;
 
-import static com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections.DOWN_TO_UP;
-import static com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections.LEFT_TO_RIGHT;
-import static com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections.RIGHT_TO_LEFT;
-import static com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections.UP_TO_DOWN;
-
-import com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections;
-import com.automation.lac.qa.fanapp.mobile.enums.TapCoordinates;
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import com.automation.lac.qa.utils.CustomException;
+import com.automation.lac.qa.utils.mobile.SwipeDirections;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.pagefactory.Widget;
 import io.qameta.allure.Allure;
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Pause;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
@@ -46,80 +32,6 @@ public class DeviceActions {
 
   public static AppiumDriver getDriver() {
     return MobileBaseScreen.getDriver();
-  }
-
-  /**
-   * Provides a way to tap an element based on its coordinates
-   *
-   * @param element        Element to receive the tap
-   * @param tapCoordinates position of the element to click
-   * @param addX           horizontal pixel count to tap from the specified tap coordinate
-   * @param addY           vertical pixel count to tap from the specified tap coordinate
-   */
-  @Deprecated(forRemoval = true)
-  public static void clickUsingPointerOptions(WebElement element, TapCoordinates tapCoordinates,
-                                              int addX, int addY, String description) {
-    Point location = element.getLocation();
-    Dimension size = element.getSize();
-    int leftX = location.getX();
-    int rightX = leftX + size.getWidth();
-    int middleX = (rightX + leftX) / 2;
-    int upperY = location.getY();
-    int lowerY = upperY + size.getHeight();
-    int middleY = (upperY + lowerY) / 2;
-    int x = addX;
-    int y = addY;
-    switch (tapCoordinates) {
-      case TOP_LEFT:
-        x += leftX;
-        y += upperY;
-        break;
-      case TOP_MIDDLE:
-        x += middleX;
-        y += upperY;
-        break;
-      case TOP_RIGHT:
-        x += rightX;
-        y += upperY;
-        break;
-      case MIDDLE_LEFT:
-        x += leftX;
-        y += middleY;
-        break;
-      case MIDDLE:
-        x += middleX;
-        y += middleY;
-        break;
-      case MIDDLE_RIGHT:
-        x += rightX;
-        y += middleY;
-        break;
-      case BOTTOM_LEFT:
-        x += leftX;
-        y += lowerY;
-        break;
-      case BOTTOM_MIDDLE:
-        x += middleX;
-        y += lowerY;
-        break;
-      case BOTTOM_RIGHT:
-        x += rightX;
-        y += lowerY;
-        break;
-      default:
-        x += middleX;
-        y += middleY;
-        break;
-    }
-    PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
-    Sequence tap = new Sequence(finger, 1);
-    tap.addAction(finger.createPointerMove(Duration.ofMillis(0),
-      PointerInput.Origin.viewport(), x, y));
-    tap.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-    tap.addAction(new Pause(finger, Duration.ofMillis(100)));
-    tap.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
-    getDriver().perform(List.of(tap));
-    Allure.step("Click over " + description);
   }
 
   /**
@@ -162,122 +74,6 @@ public class DeviceActions {
     Allure.step("Swipe over " + description);
   }
 
-  @Deprecated(forRemoval = true)
-  public static void swipe(SwipeDirections direction) {
-    swipe(direction, 0.25, 0.25, 0.25, 0.25, false);
-  }
-
-  @Deprecated(forRemoval = true)
-  public static void swipe(SwipeDirections direction, double leftRatio, double rightRatio,
-                           double upRatio, double downRatio, boolean isFlexible) {
-    swipe(direction, leftRatio, rightRatio, upRatio, downRatio, isFlexible, 1);
-  }
-
-  /**
-   * It will swipe from the center position of the given webElement in the provided direction till
-   * the ending ratio relative to screen.
-   * <br><br>Below is an example to swipe from the center of an element in up direction in 1 second
-   * and leave 10 percentage of the upper screen bound.
-   * <pre>
-   * swipe(DOWN_TO_UP, element, 0.1, 1);
-   * </pre>
-   *
-   * @param direction    DOWN_TO_UP, UP_TO_DOWN, RIGHT_TO_LEFT, LEFT_TO_RIGHT
-   * @param element      WebElement from which we need to swipe through
-   * @param ratioToLeave percentage ratio(0 to 1) to leave(relative to screen)
-   *                     from the ending side of the swipe
-   * @param duration     seconds to be taken to execute the action
-   */
-  @Deprecated(forRemoval = true)
-  public static void swipe(SwipeDirections direction, WebElement element, double ratioToLeave,
-                           double duration) {
-    int milliDuration = (int) (duration * 1000);
-    Point elementCenterPoint = getCenter(element);
-    int startX = elementCenterPoint.getX();
-    int startY = elementCenterPoint.getY();
-    Dimension dim = MobileBaseScreen.getDriver().manage().window().getSize();
-    int x = dim.getWidth();
-    int y = dim.getHeight();
-    int horizontalScreenRatio = (int) (x * ratioToLeave);
-    int verticalScreenRatio = (int) (y * ratioToLeave);
-    int endX;
-    if ((direction.equals(DOWN_TO_UP) || direction.equals(UP_TO_DOWN))) {
-      endX = elementCenterPoint.getX();
-    } else {
-      if (direction.equals(LEFT_TO_RIGHT)) {
-        int ratio = x - horizontalScreenRatio;
-        endX = ratio <= startX ? x : ratio;
-      } else
-        endX = horizontalScreenRatio >= startX ? 0 : horizontalScreenRatio;
-    }
-    int endY;
-    if ((direction.equals(LEFT_TO_RIGHT) || direction.equals(RIGHT_TO_LEFT))) {
-      endY = elementCenterPoint.getY();
-    } else {
-      if (direction.equals(UP_TO_DOWN)) {
-        int ratio = y - verticalScreenRatio;
-        endY = ratio <= startY ? y : ratio;
-      } else
-        endY = verticalScreenRatio >= startY ? 0 : verticalScreenRatio;
-    }
-    swipe(milliDuration, startX, startY, endX, endY);
-  }
-
-  /**
-   * Swipe the screen with given parameters
-   *
-   * @param direction  DOWN_TO_UP, UP_TO_DOWN, RIGHT_TO_LEFT, LEFT_TO_RIGHT
-   * @param leftRatio  percentage to leave from left
-   * @param rightRatio percentage to leave from right
-   * @param upRatio    percentage to leave from up
-   * @param downRatio  percentage to leave from down
-   * @param isFlexible if true it will take all the ratios as is
-   *                   otherwise it will take middle position to swipe the screen
-   * @param duration   seconds to be taken to execute the action
-   */
-  @Deprecated(forRemoval = true)
-  public static void swipe(SwipeDirections direction, double leftRatio, double rightRatio,
-                           double upRatio, double downRatio, boolean isFlexible,
-                           double duration) {
-    int milliDuration = (int) (duration * 1000);
-    Dimension dim = MobileBaseScreen.getDriver().manage().window().getSize();
-    int x = dim.getWidth();
-    int horizontalMid = x / 2;
-    int left = (leftRatio == 0) ? x : (int) (x * leftRatio);
-    int right = (rightRatio == 0) ? x : (int) (x * rightRatio);
-    int y = dim.getHeight();
-    int verticalMid = y / 2;
-    int up = (upRatio == 0) ? y : (int) (y * upRatio);
-    int down = (downRatio == 0) ? y : (int) (y * downRatio);
-    switch (direction) {
-      case DOWN_TO_UP -> {
-        if (!isFlexible)
-          swipe(milliDuration, horizontalMid, y - down, horizontalMid, up);
-        else
-          swipe(milliDuration, left, y - down, right, up);
-      }
-      case UP_TO_DOWN -> {
-        if (!isFlexible)
-          swipe(milliDuration, horizontalMid, up, horizontalMid, y - down);
-        else
-          swipe(milliDuration, left, up, right, y - down);
-      }
-      case RIGHT_TO_LEFT -> {
-        if (!isFlexible)
-          swipe(milliDuration, x - right, verticalMid, left, verticalMid);
-        else
-          swipe(milliDuration, x - right, up, left, down);
-      }
-      case LEFT_TO_RIGHT -> {
-        if (!isFlexible)
-          swipe(milliDuration, left, verticalMid, x - right, verticalMid);
-        else
-          swipe(milliDuration, left, up, x - right, down);
-      }
-      default -> throw new CustomException("swipe format is invalid");
-    }
-  }
-
   /**
    * Scroll the screen from one point to another
    *
@@ -304,19 +100,6 @@ public class DeviceActions {
         finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
     getDriver().perform(List.of(swipe));
 
-  }
-
-  /**
-   * Returns the center point of the given webElement
-   *
-   * @param webElement element
-   * @return point forming the center coordinate of element
-   */
-  @Deprecated(forRemoval = true)
-  public Point getCenter(WebElement webElement) {
-    Rectangle elementRectangle = webElement.getRect();
-    return new Point(elementRectangle.getX() + elementRectangle.getWidth() / 2,
-      elementRectangle.getY() + elementRectangle.getHeight() / 2);
   }
 
   /**
@@ -360,31 +143,6 @@ public class DeviceActions {
   }
 
   /**
-   * Wait for element become not displayed and not enabled
-   *
-   * @return boolean indicating if the element is no longer displayed and not enabled
-   */
-  @Deprecated(forRemoval = true)
-  public static Boolean waitForElementNotVisibleOrDisabled(int seconds, WebElement element) {
-    return getCustomFluentWait(seconds).until(new ExpectedCondition<>() {
-      @Override
-      public Boolean apply(WebDriver driver) {
-        try {
-          // Check if the element is not displayed or not enabled
-          return !element.isDisplayed() && !element.isEnabled();
-        } catch (Exception e) {
-          return true;
-        }
-      }
-
-      @Override
-      public String toString() {
-        return "element to not be visible or not be enabled: " + element;
-      }
-    });
-  }
-
-  /**
    * getFluentWait
    *
    * @return new FluentWait instance
@@ -397,86 +155,6 @@ public class DeviceActions {
       .ignoring(StaleElementReferenceException.class)
       .ignoring(NoSuchElementException.class)
       .ignoring(Exception.class);
-  }
-
-  /**
-   * Wait for element become not displayed
-   *
-   * @return boolean indicating if the element is no longer displayed
-   */
-  @Deprecated(forRemoval = true)
-  public static Boolean waitForElementInvisibility(int seconds, WebElement element) {
-    return getCustomFluentWait(seconds).until(ExpectedConditions.invisibilityOf(element));
-  }
-
-  /**
-   * Wait for element to become clickable
-   *
-   * @return WebElement the element when it is in clickable state
-   */
-  @Deprecated(forRemoval = true)
-  public static WebElement waitForElementBeClickable(int seconds, WebElement element) {
-    return getCustomFluentWait(seconds).until(ExpectedConditions.elementToBeClickable(element));
-  }
-
-  /**
-   * Scrolls into list of elements in the specified direction (LEFT, RIGHT, UP, DOWN)
-   * until it finds the element with specific condition or reaches the end of the scrollable area.
-   *
-   * @param visibleRelatives List WebElement to scroll into
-   * @param direction        direction to scroll
-   * @param percentToScroll  value in percent defining the distance to move
-   * @param condition        condition expected element to have
-   * @return WebElement found element
-   */
-  @Deprecated(forRemoval = true)
-  public static WebElement scrollIntoListToElementWithCondition(List<WebElement> visibleRelatives,
-                                                                SwipeDirections direction,
-                                                                int percentToScroll,
-                                                                Predicate<WebElement> condition) {
-
-    if (Boolean.FALSE.equals(waitForListWebElementsIsNotEmpty(7, visibleRelatives))) {
-      throw new CustomException("No displayed elements found in the list");
-    }
-    String previousPageSource = "";
-    Supplier<List<WebElement>> currentCollection = () -> visibleRelatives.stream()
-      .filter(WebElement::isDisplayed).toList();
-
-    Optional<WebElement> expected =
-      currentCollection.get().stream().filter(condition).findFirst();
-    if (expected.isPresent() && (expected.get().isDisplayed())) {
-      return expected.get();
-    }
-
-    while (Boolean.TRUE.equals(!isScrolledToTheEndOfDirection(previousPageSource))) {
-      performSwipe(direction, percentToScroll, "Event List");
-      expected = currentCollection.get().stream().filter(condition).findFirst();
-      if (expected.isPresent() && (expected.get().isDisplayed())) {
-        return expected.get();
-      }
-      previousPageSource = getDriver().getPageSource();
-    }
-    throw new CustomException(NOT_FOUND_DURING_SCROLLING + direction);
-  }
-
-  /**
-   * Wait for list of webElements become not empty
-   *
-   * @return boolean indicating if list is not empty
-   */
-  @Deprecated(forRemoval = true)
-  public static Boolean waitForListWebElementsIsNotEmpty(int seconds, List<WebElement> elements) {
-    return getCustomFluentWait(seconds).until(driver -> !elements.isEmpty());
-  }
-
-  /**
-   * Wait for list of webElements become not empty
-   *
-   * @return boolean indicating if list is not empty
-   */
-  @Deprecated(forRemoval = true)
-  public static Boolean waitForListWidgetsIsNotEmpty(int seconds, List<? extends Widget> elements) {
-    return getCustomFluentWait(seconds).until(driver -> !elements.isEmpty());
   }
 
   /**
@@ -518,49 +196,6 @@ public class DeviceActions {
   }
 
   /**
-   * Checks if the provided WebElement is enabled.
-   *
-   * @param element The WebElement to check enabled property.
-   * @return true if the element is enabled, false otherwise.
-   */
-  @Deprecated(forRemoval = true)
-  public static boolean quickIsEnabled(WebElement element) {
-    Duration originalImplicitWait = getDriver().manage().timeouts().getImplicitWaitTimeout();
-    getDriver().manage().timeouts().implicitlyWait(Duration.ZERO);
-    try {
-      element.isEnabled();
-      return true;
-    } catch (Exception e) {
-      log.warn("Element is not enabled");
-      return false;
-    } finally {
-      getDriver().manage().timeouts().implicitlyWait(originalImplicitWait);
-    }
-  }
-
-  /**
-   * Checks if the provided WebElement is selected.
-   *
-   * @param element The WebElement to check selected property.
-   * @return true if the element is selected, false otherwise.
-   */
-  @Deprecated(forRemoval = true)
-  public static boolean quickIsSelected(WebElement element) {
-    Duration originalImplicitWait = getDriver().manage().timeouts().getImplicitWaitTimeout();
-    getDriver().manage().timeouts().implicitlyWait(Duration.ZERO);
-    try {
-      element.isSelected();
-      return true;
-    } catch (Exception e) {
-      log.warn("Element is not selected");
-      return false;
-    } finally {
-      getDriver().manage().timeouts().implicitlyWait(originalImplicitWait);
-    }
-  }
-
-
-  /**
    * Wait for element to be visible, if element is not visible it returns false and continues
    *
    * @param element       element to wait for
@@ -579,59 +214,6 @@ public class DeviceActions {
     } finally {
       getDriver().manage().timeouts().implicitlyWait(originalImplicitWait);
     }
-  }
-
-  /**
-   * Wait for element to be visible, if element is not visible it returns false and continues
-   *
-   * @param by            locator to find element
-   * @param timeInSeconds time to wait the element
-   * @return boolean indicating if element is found or not
-   */
-  @Deprecated(forRemoval = true)
-  public static boolean waitForElementVisibility(By by, int timeInSeconds) {
-    Duration originalImplicitWait = getDriver().manage().timeouts().getImplicitWaitTimeout();
-    getDriver().manage().timeouts().implicitlyWait(Duration.ZERO);
-    try {
-      WebElement element = getCustomFluentWait(timeInSeconds)
-        .until(ExpectedConditions.visibilityOfElementLocated(by));
-      return element.isDisplayed();
-    } catch (StaleElementReferenceException | TimeoutException | NoSuchElementException var4) {
-      return false;
-    } finally {
-      getDriver().manage().timeouts().implicitlyWait(originalImplicitWait);
-    }
-  }
-
-  /**
-   * Wait for element to be enabled
-   *
-   * @return boolean indicating if the element is enabled
-   */
-  @Deprecated(forRemoval = true)
-  public static Boolean waitForElementToBeEnabled(int seconds, WebElement element) {
-    return getCustomFluentWait(seconds).until(
-      ExpectedConditions.attributeToBe(element, "enabled", "true"));
-  }
-
-  /**
-   * Retrieves the web element based on the provided locator
-   * Catches NoSuchElementException, StaleElementReferenceException, and other exceptions,
-   * logging them with Allure
-   */
-  @Deprecated(forRemoval = true)
-  public static WebElement getElement(By by) {
-    WebElement element = null;
-    try {
-      element = getDriver().findElement(by);
-    } catch (NoSuchElementException var4) {
-      Allure.issue("NoSuchElementException thrown", "");
-    } catch (StaleElementReferenceException var5) {
-      Allure.issue("StaleElementReferenceException thrown", "");
-    } catch (Exception var6) {
-      Allure.issue("Exception thrown", "");
-    }
-    return element;
   }
 
   /**

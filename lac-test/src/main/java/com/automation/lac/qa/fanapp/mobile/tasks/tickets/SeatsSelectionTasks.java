@@ -4,6 +4,7 @@ import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.ACCES
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.DECREASE_SEATS;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.INCREASE_SEATS;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementAttributeNotContainsValue;
 
 import com.automation.lac.qa.fanapp.mobile.screens.tickets.SeatsSelectionScreen;
 
@@ -20,6 +21,9 @@ public class SeatsSelectionTasks extends SeatsSelectionScreen {
    * Select Seat Count Increase Button
    */
   public void updateSeatsToPurchase(int totalSeat) {
+    String attributeName = isAndroid() ? "text" : "label";
+    waitForElementAttributeNotContainsValue(getSelectedSeatCountFromScreen(), attributeName, "0",
+      5);
     if (totalSeat != getDefaultSeatsCount() && getDefaultSeatsCount() != 1) {
       if (totalSeat < getDefaultSeatsCount()) {
         clickOnDecreaseButton(getDefaultSeatsCount() - totalSeat);

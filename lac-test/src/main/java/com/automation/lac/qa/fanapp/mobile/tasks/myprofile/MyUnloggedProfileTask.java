@@ -18,9 +18,26 @@ public class MyUnloggedProfileTask extends MyUnloggedProfileScreen {
    * then proceeds to the login screen through the welcomeHomeTask.
    */
   public void goToLoginFromWelcomeHomeScreen() {
-    click(homeScreen.getBtnProfile(), MY_PROFILE.getValue());
-    click(getBtnLoginCreateAccount(), LOG_IN_CREATE_ACCOUNT.getValue());
+    goToWelcomeHomeFromProfile();
     welcomeHomeTask.goToLogin();
   }
 
+  /**
+   * Navigates from the Welcome home screen to the login screen.
+   * It performs clicks on the profile button and the "LOG IN/CREATE ACCOUNT" button,
+   * then proceeds to the create account screen through the welcomeHomeTask.
+   */
+  public void goToCreateAccountFromWelcomeHomeScreen() {
+    goToWelcomeHomeFromProfile();
+    welcomeHomeTask.getBtnCreateAnAccount();
+  }
+
+  /**
+   * Navigates from the Welcome home screen to the login screen.
+   * It performs clicks on the profile button and the "LOG IN/CREATE ACCOUNT" button,
+   */
+  public void goToWelcomeHomeFromProfile() {
+    click(homeScreen.getBtnProfile(), MY_PROFILE.getValue());
+    click(getBtnLoginCreateAccount(), LOG_IN_CREATE_ACCOUNT.getValue());
+  }
 }

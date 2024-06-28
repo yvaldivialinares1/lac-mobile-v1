@@ -23,7 +23,8 @@ import org.testng.ITestListener;
 import org.testng.ITestResult;
 
 @Slf4j
-public class TestListener implements ISuiteListener, ITestListener, IExecutionListener,
+public class TestListener
+  implements ISuiteListener, ITestListener, IExecutionListener,
   IInvokedMethodListener {
 
   protected AllureLogger report = new AllureLogger();

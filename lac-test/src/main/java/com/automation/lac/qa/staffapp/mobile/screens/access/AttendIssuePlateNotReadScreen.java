@@ -2,6 +2,7 @@ package com.automation.lac.qa.staffapp.mobile.screens.access;
 
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import java.util.List;
 import lombok.Getter;
 import org.openqa.selenium.WebElement;
 
@@ -17,6 +18,15 @@ public class AttendIssuePlateNotReadScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(accessibility = "vehicle_licensePlate_inputfield")
   private WebElement vehicleLicensePlateInputField;
 
-  @iOSXCUITFindBy(accessibility = "vehicle_state_inputfield")
-  private WebElement vehicleStateInputField;
+  @iOSXCUITFindBy(accessibility = "state")
+  private WebElement btnVehicleStateExpandDropDown;
+
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'state_name'")
+  private List<WebElement> dropDownStates;
+
+  @iOSXCUITFindBy(iOSNsPredicate = "label == 'CONTINUE'")
+  private WebElement btnContinue;
+
+  @iOSXCUITFindBy(accessibility = "attend_issue_primary_button")
+  private WebElement btnPrimary;
 }

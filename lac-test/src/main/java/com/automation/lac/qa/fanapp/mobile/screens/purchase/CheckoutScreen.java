@@ -1,25 +1,29 @@
 package com.automation.lac.qa.fanapp.mobile.screens.purchase;
 
+import static com.automation.lac.qa.utils.mobile.DeviceActions.getElement;
+
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import java.util.List;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 @Getter
+@Slf4j
 public class CheckoutScreen extends MobileBaseScreen {
 
   @AndroidFindBy(xpath = "//android.widget.TextView[@text='Payment Method']")
   @iOSXCUITFindBy(accessibility = "Payment Method")
   private WebElement txtCheckoutPaymentMethod;
 
-  @AndroidFindBy(xpath = "//android.widget.TextView[@text='Add card']")
+  @AndroidFindBy(id = "addCardButton")
   @iOSXCUITFindBy(accessibility = "payment_method_add_card_title")
   private WebElement btnCheckoutAddCard;
 
-  @AndroidFindBy(xpath = "//android.widget.TextView[@text='Change']")
+  @AndroidFindBy(id = "addCardButton")
   @iOSXCUITFindBy(accessibility = "payment_method_add_card_title")
   private WebElement btnCheckoutChange;
 
@@ -51,9 +55,7 @@ public class CheckoutScreen extends MobileBaseScreen {
     + "XCUIElementTypeStaticText[@name = 'payment_method_card_name_label']")
   private WebElement preferredCard;
 
-
-  @AndroidFindBy(xpath = "//android.widget.TextView[@text='PLACE ORDER']/parent::"
-    + "android.view.View[@resource-id='tvPlaceOrder']")
+  @AndroidFindBy(id = "btnPLACE ORDER")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[@name='PLACE ORDER']")
   private WebElement btnPlaceOrder;
 
@@ -76,7 +78,7 @@ public class CheckoutScreen extends MobileBaseScreen {
   private WebElement checkoutSummaryEventName;
 
   protected WebElement checkoutSubDescription() {
-    return getDriver().findElement(By.xpath(!isAndroid()
+    return getElement(By.xpath(!isAndroid()
       ? "//XCUIElementTypeStaticText[@name='checkout_seat_details']"
       + "[contains(@label, concat('You've selected %s seats, %s,',''))] "
       : "//android.widget.TextView[@resource-id='tvDescription']"
@@ -86,15 +88,15 @@ public class CheckoutScreen extends MobileBaseScreen {
   /**
    * returning selected radio state for non preferred card in checkout screen
    */
-  public static WebElement rdoNonPreferredCard(String lastFour) {
+  public static WebElement getRdoNonPreferredCard(String lastFour) {
+    String xpath;
     if (!isAndroid()) {
-      return getDriver().findElement(
-        By.xpath(String.format("//XCUIElementTypeStaticText[@name='card_"
-          + "details_card_number'][contains(@label,'%s')]", lastFour)));
+      xpath = String.format("//XCUIElementTypeStaticText[@name='payment_method"
+        + "_card_name_label'][contains(@label,'%s')]", lastFour);
     } else {
-      return getDriver().findElement(
-        By.xpath(String.format("//android.widget.TextView[contains(@text,'%s')]/"
-          + "preceding-sibling::android.view.View[@content-desc ='Selected']", lastFour)));
+      xpath = String.format("//android.widget.TextView[contains(@text,'%s')]/"
+        + "preceding-sibling::android.view.View[@content-desc ='Selected']", lastFour);
     }
+    return getElement(By.xpath(xpath));
   }
 }

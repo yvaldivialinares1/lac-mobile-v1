@@ -1,14 +1,14 @@
 package com.automation.lac.qa.fanapp.mobile.stepsdefinitions;
 
-import com.automation.lac.qa.fanapp.mobile.tasks.modals.ModalGoCashlessTasks;
+import com.automation.lac.qa.fanapp.mobile.tasks.modals.GoCashlessModalTask;
 import io.cucumber.java.en.And;
 
 public class ModalStepsDefinition {
 
-  protected ModalGoCashlessTasks modalGoCashlessTasks = new ModalGoCashlessTasks();
+  private final GoCashlessModalTask goCashlessModalTask = new GoCashlessModalTask();
 
   @And("the user clicks on remind me later on go cashless modal")
   public void theUserClicksOnRemindMeLaterOnGoCashlessModal() {
-    modalGoCashlessTasks.clickOnRemindMeLater();
+    goCashlessModalTask.clickOnRemindMeLater();
   }
 }

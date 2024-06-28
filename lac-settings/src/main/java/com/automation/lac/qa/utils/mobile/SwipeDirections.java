@@ -11,5 +11,7 @@ public enum SwipeDirections {
   TOP_PAGE,
   BOTTOM_PAGE,
   LEFT_PAGE,
-  RIGHT_PAGE
+  RIGHT_PAGE,
+  HORIZONTAL,
+  VERTICAL
 }

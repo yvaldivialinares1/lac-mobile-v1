@@ -34,9 +34,9 @@ public class TeammateAccountsScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(accessibility = "id_btn_mini_fan_item_delete_icon")
   private List<WebElement> btnDeleteMTeammateAccount;
 
-  @AndroidFindBy(uiAutomator = "resourceId(\"btnAdd Teammate To Your Profile\")")
+  @AndroidFindBy(id = "btn<p>ADD TEAMMATE ACOUNT</p>")
   @iOSXCUITFindBy(iOSNsPredicate = "name CONTAINS 'ADD TEAMMATE' AND type CONTAINS 'Button'")
-  private WebElement btnAddTeammateToYourProfile;
+  private WebElement btnAddTeammateAccount;
 
   @AndroidFindBy(accessibility = "Back")
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'Back' AND type == 'XCUIElementTypeButton'")

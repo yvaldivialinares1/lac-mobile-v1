@@ -1,16 +1,18 @@
 package com.automation.lac.qa.fanapp.mobile.utils;
 
-import static com.automation.lac.qa.pages.MobileBaseScreen.isAndroid;
-
 import com.automation.lac.qa.fanapp.mobile.enums.TicketType;
 import com.automation.lac.qa.utils.CustomException;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @UtilityClass
 public class TicketScreenUtils {
 
@@ -29,12 +31,7 @@ public class TicketScreenUtils {
     String suffix = getDayOfMonthSuffix(zdt.getDayOfMonth());
     // Format the time part of the date
     String formattedTime = "";
-    if (isAndroid()) {
-      formattedTime = String.format("%02d:%02d %s",
-        zdt.getHour() % 12 == 0 ? 12 : zdt.getHour() % 12,
-        zdt.getMinute(),
-        zdt.getHour() >= 12 ? "PM" : "AM");
-    } else formattedTime = String.format("%d:%02d %s",
+    formattedTime = String.format("%d:%02d %s",
       zdt.getHour() % 12 == 0 ? 12 : zdt.getHour() % 12,
       zdt.getMinute(),
       zdt.getHour() >= 12 ? "PM" : "AM");
@@ -95,8 +92,41 @@ public class TicketScreenUtils {
         } else
           return parts[parts.length - 5] + ", " + parts[parts.length - 4] + ", "
             + parts[parts.length - 3];
+      } case PARKING -> {
+        String[] parts = textData.split(", ");
+        if (textData.toLowerCase().contains("today")) {
+          return parts[parts.length - 5].trim() + ", " + parts[parts.length - 4].trim();
+        } else
+          return parts[parts.length - 6] + ", " + parts[parts.length - 5] + ", "
+            + parts[parts.length - 4];
       }
       default -> throw new CustomException("Please select correct ticket type (Game|Event)");
+    }
+  }
+
+  /**
+   * Change date format depending on format from the app
+   * @param date        - Date to change
+   * @param ticketInfo  - Ticket info contains date in format given by the app
+   * @return formatted date
+   */
+  public static String setDateFormatToPlatformFormat(String date, String ticketInfo)  {
+
+    if (ticketInfo.contains("PM") || ticketInfo.contains("AM")) {
+      return date;
+    } else if (ticketInfo.contains("p.m.") || ticketInfo.contains("a.m.")) {
+      return date.replace("PM", "p.m.").replace("AM", "a.m.");
+    } else {
+      String[] parts = date.split(", ");
+
+      DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("h:mm a");
+      DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+      LocalTime time = LocalTime.parse(parts[2].replace("at ", ""), inputFormatter);
+      String formattedTime = time.format(outputFormatter);
+      String convertedDate = String.format("%s, %s, at %s", parts[0], parts[1], formattedTime);
+      log.info("Converted date: {}", convertedDate);
+      return convertedDate;
     }
   }
 }

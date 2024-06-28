@@ -20,8 +20,7 @@ public class AddressInformationScreen extends MobileBaseScreen {
 
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_input_address_line_2_field'"
     + " AND type == 'XCUIElementTypeTextField'")
-  @AndroidFindBy(uiAutomator = "resourceId(\"tfAPP, SUITE, UNIT, BUILDING, FLOOR, "
-    + "ETC\")")
+  @AndroidFindBy(uiAutomator = "resourceId(\"tfapp, suite, unit, building, floor, etc\")")
   private WebElement inputAppFloor;
 
   @iOSXCUITFindBy(accessibility = "id_dropdown_input_country_field")
@@ -39,7 +38,7 @@ public class AddressInformationScreen extends MobileBaseScreen {
 
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_input_zipcode_field' AND "
     + "type == 'XCUIElementTypeTextField'")
-  @AndroidFindBy(xpath = "//android.view.View[contains(@content-desc, 'ZIPCODE')]/..")
+  @AndroidFindBy(xpath = "//android.view.View[contains(@content-desc, 'ZIP CODE*')]/..")
   private WebElement inputZipCode;
 
   @iOSXCUITFindBy(accessibility = "id_btn_continue_ds_button")
@@ -55,6 +54,14 @@ public class AddressInformationScreen extends MobileBaseScreen {
 
   @iOSXCUITFindBy(iOSNsPredicate = "name BEGINSWITH 'id_state'")
   private List<WebElement> labelStatesList;
+
+  @iOSXCUITFindBy(accessibility = "primary_rectangle_button")
+  @AndroidFindBy(id = "btnCONFIRM MY ACCOUNT")
+  private WebElement btnConfirmMyAccount;
+
+  @iOSXCUITFindBy(accessibility = "id_label_wizard_title")
+  @AndroidFindBy(uiAutomator = "textContains(\"ADDRESS INFORMATION\")")
+  private WebElement lblAddressInformation;
 
   protected static final String XPATH_EXPECTED_OPTION = "//android.view.View[@content-desc=\"%s\"]";
 

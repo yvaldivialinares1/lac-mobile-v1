@@ -3,10 +3,10 @@ package com.automation.lac.qa.fanapp.mobile.tasks.identitycreateanaccount;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.CONTINUE;
 import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.OTP_CODE;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
-import static com.automation.lac.qa.utils.mobile.DeviceActions.hideKeyboard;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.performText;
 
 import com.automation.lac.qa.fanapp.mobile.screens.identitycreateanaccount.CheckYourEmailScreen;
+import io.qameta.allure.Step;
 
 public class CheckYourEmailTask extends CheckYourEmailScreen {
 
@@ -16,6 +16,7 @@ public class CheckYourEmailTask extends CheckYourEmailScreen {
    *
    * @param otpCode The OTP code to be entered.
    */
+  @Step("Complete the OTP mail process")
   public void manageEmailOtpCode(String otpCode) {
     completeEmailOtpCode(otpCode);
     click(getBtnContinue(), CONTINUE.getValue());
@@ -29,6 +30,5 @@ public class CheckYourEmailTask extends CheckYourEmailScreen {
    */
   public void completeEmailOtpCode(String otpCode) {
     performText(getInputNumberCode(), otpCode, OTP_CODE.getValue());
-    hideKeyboard(null);
   }
 }

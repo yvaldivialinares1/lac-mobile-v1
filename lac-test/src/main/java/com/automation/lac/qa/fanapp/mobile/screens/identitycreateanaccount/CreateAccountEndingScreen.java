@@ -18,6 +18,11 @@ public class CreateAccountEndingScreen extends MobileBaseScreen {
   private WebElement lblCompleteLaterMessage;
 
   @AndroidFindBy(uiAutomator = "resourceId(\"ProcessEndingMissingStepsbtnPrimary\")")
-  @iOSXCUITFindBy(iOSNsPredicate = "label == \"take me to intuit dome, button, enabled\"")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_btn_primary_ds_button'")
   private WebElement btnTakeMeToIntuitDome;
+
+  //TODO: iOS locator is pending due to bugs CA-52499, CA-52110
+  @AndroidFindBy(id = "btnCONTINUE WITH YOUR PURCHASE")
+  @iOSXCUITFindBy(id = "RBD")
+  private WebElement btnContinuePurchase;
 }

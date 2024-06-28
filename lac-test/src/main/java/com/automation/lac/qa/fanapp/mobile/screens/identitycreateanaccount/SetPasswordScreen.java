@@ -8,25 +8,31 @@ import org.openqa.selenium.WebElement;
 
 @Getter
 public class SetPasswordScreen extends MobileBaseScreen {
+
   @iOSXCUITFindBy(accessibility = "id_btn_password_security_on")
   @AndroidFindBy(uiAutomator = "description(\"Show password\").instance(0)")
   private WebElement btnShowSetAPassword;
 
-  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[@name=\"id_input_password_field\"]"
+  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[@name='id_input_password_field']"
     + "/XCUIElementTypeTextField")
   @AndroidFindBy(xpath = "//android.view.View[contains(@content-desc, 'SET A PASSWORD')]/..")
   private WebElement inputSetAPassword;
 
   @iOSXCUITFindBy(accessibility = "id_btn_confirm_password_security_on")
-  @AndroidFindBy(uiAutomator = "description(\"Show password\").instance(1)")
+  @AndroidFindBy(uiAutomator = "description(\"Show password\").instance(0)")
   private WebElement btnShowConfirmPassword;
 
-  @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeOther[`label == \"CONFIRM PASSWORD, required "
-    + "input\"`]/XCUIElementTypeTextField")
+  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[@name='id_input_confirm_password_field']"
+    + "/XCUIElementTypeTextField")
   @AndroidFindBy(xpath = "//android.view.View[contains(@content-desc, 'CONFIRM PASSWORD')]/..")
   private WebElement inputConfirmPassword;
 
-  @iOSXCUITFindBy(accessibility = "primary_brush_button")
-  @AndroidFindBy(accessibility = "confirm my account")
+  @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[@name='id_input_confirm_password_field']"
+    + "/XCUIElementTypeSecureTextField")
+  @AndroidFindBy(xpath = "//android.view.View[contains(@content-desc, 'CONFIRM PASSWORD')]/..")
+  private WebElement inputHiddenConfirmPassword;
+
+  @iOSXCUITFindBy(accessibility = "id_btn_continue_ds_button")
+  @AndroidFindBy(uiAutomator = "descriptionContains(\"CONTINUE\")")
   private WebElement btnConfirmMyAccount;
 }

@@ -104,8 +104,7 @@ public class MagnifAiApi {
    *
    * @param executionName The name of the execution to be created.
    * @param projectId     The ID of the project under which the execution is to be created.
-   * @return CreateExecutionResponse The response object that contains information about the
-   *    newly created execution.
+   * @return CreateExecutionResponse Object contains information about the newly created execution.
    */
   @Step("Create execution Using execution name: {0} And the project ID: {1}")
   public static CreateExecutionResponse createExecution(String executionName, String projectId) {
@@ -343,8 +342,7 @@ public class MagnifAiApi {
    *                       the main image.
    * @param testMode       The mode of the test that may alter the location behavior or criteria.
    *                       This can include different levels of strictness or search algorithms.
-   * @return FlexibleLocateImageResponse object containing the results of the flexible image
-   *   location operation.
+   * @return FlexibleLocateImageResponse object containing the results of the flexible image.
    */
   @Step("Flex Locate Image Using execution ID: {1} And the test name: {0}")
   public static FlexibleLocateImageResponse flexibleLocateImage(String testName, String executionId,
@@ -376,8 +374,7 @@ public class MagnifAiApi {
    * This method converts the provided request object into a map of form parameters.
    *
    * @param requestObject The object to be converted into a map of form parameters.
-   * @return A Request object with the form parameters and files set, ready to make an HTTP
-   *    request.
+   * @return A Request object with the form parameters and files set.
    */
   private static Request prepareFormParamsRequest(Object requestObject) {
     Request request = new Request();
@@ -420,7 +417,7 @@ public class MagnifAiApi {
       String bodyRequest = objectMapper.writeValueAsString(requestObject);
       return request.body(bodyRequest);
     } catch (JsonProcessingException e) {
-      throw new CustomException("Error parsing the Json object:", e);
+      throw new CustomException("Error parsing the Json object.", e);
     }
   }
 

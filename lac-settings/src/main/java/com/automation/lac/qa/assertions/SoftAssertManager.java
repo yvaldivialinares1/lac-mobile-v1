@@ -43,7 +43,12 @@ public class SoftAssertManager {
     SoftAssert softAssert = softAssertThreadLocal.get();
     if (softAssert != null) {
       log.info("Verifying soft asserts in the scenario");
-      softAssert.assertAll();
+      try {
+        softAssert.assertAll();
+      } catch (AssertionError e) {
+        softAssertThreadLocal.set(new CustomSoftAssert());
+        throw e;
+      }
       clearSoftAsserts();
     }
   }

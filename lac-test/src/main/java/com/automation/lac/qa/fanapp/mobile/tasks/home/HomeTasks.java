@@ -1,75 +1,42 @@
 package com.automation.lac.qa.fanapp.mobile.tasks.home;
 
+import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.CLIPPERS_FAN;
+import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.CONCERT_FAN;
+import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.EVENTS;
+import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.HOME;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.MENU;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.MY_ACCOUNT_SETTINGS;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.MY_PAYMENTS;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.MY_PROFILE;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.MY_VEHICLES;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.PAYMENT_METHODS_MANAGEMENT;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.SWITCH_CONCERT_FAN;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.THEME_SWITCH;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.TICKETS;
+import static com.automation.lac.qa.fanapp.mobile.enums.FanAppKeys.SELECTED_THEME;
+import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
-import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementNotVisibleOrDisabled;
+import static com.automation.lac.qa.utils.mobile.SwipeActions.swipeElementToTheBorder;
+import static com.automation.lac.qa.utils.mobile.SwipeDirections.TOP_PAGE;
+import static com.automation.lac.qa.utils.mobile.WaitActions.isTheElementVisible;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementVisibility;
 
-import com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections;
 import com.automation.lac.qa.fanapp.mobile.screens.home.HomeScreen;
-import com.automation.lac.qa.fanapp.mobile.screens.home.MenuScreen;
-import com.automation.lac.qa.fanapp.mobile.screens.myprofile.MyLoggedProfileScreen;
-import com.automation.lac.qa.fanapp.mobile.screens.paymentmethods.MyPaymentsScreen;
-import com.automation.lac.qa.fanapp.mobile.utils.DeviceActions;
-import com.automation.lac.qa.utils.mobile.WaitActions;
+import com.automation.lac.qa.fanapp.mobile.tasks.commons.CommonTask;
+import com.automation.lac.qa.fanapp.mobile.tasks.myprofile.MyLoggedProfileTask;
 import io.qameta.allure.Step;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class HomeTasks extends HomeScreen {
 
-  protected MyPaymentsScreen myPaymentsScreen = new MyPaymentsScreen();
-  protected MyLoggedProfileScreen myProfileLoggedScreen = new MyLoggedProfileScreen();
-  protected MenuScreen menuScreen = new MenuScreen();
+  private final CommonTask commonTask = new CommonTask();
 
+  /**
+   * Navigates from the home page to the user's profile.
+   *
+   * @return An instance of {@link MyLoggedProfileTask} representing the user's profile.
+   */
   @Step("User navigates from Home Screen to My Profile Screen")
-  public void goToMyProfileFromHome() {
+  public MyLoggedProfileTask goToMyProfileFromHome() {
+    waitForElementVisibility(getBtnProfile(), 5);
     click(getBtnProfile(), MY_PROFILE.getValue());
-  }
-
-  /**
-   * Navigates the user from the Home screen to the My Payments screen.
-   */
-  @Step("User navigates from Home to My Payments")
-  public void goToMyPaymentsFromHome() {
-    goToMyProfileFromHome();
-    WaitActions.waitForElementVisibility(myProfileLoggedScreen.getPnlYourNextEvent(),3);
-    DeviceActions.verticallyScrollToElement(myProfileLoggedScreen.getBtnMyPayments(),
-      SwipeDirections.DOWN_TO_UP,5, 30);
-    click(myProfileLoggedScreen.getBtnMyPayments(), MY_PAYMENTS.getValue());
-  }
-
-  /**
-   * Navigates the user from the Home screen to the Payment Methods Management screen.
-   */
-  @Step("User navigates from Home to Payments Methods Management")
-  public void goToPaymentMethodsManagementFromHome() {
-    goToMyPaymentsFromHome();
-    click(myPaymentsScreen.getBtnPaymentMethodManagement(),PAYMENT_METHODS_MANAGEMENT.getValue());
-  }
-
-  /**
-   * Navigates the user from the Home screen to the My Account Settings screen.
-   */
-
-  @Step("User navigates from Home to My Account Settings")
-  public void goToMyAccountSettingsFromHome() {
-    goToMyProfileFromHome();
-    click(myProfileLoggedScreen.getBtnMyAccountSettings(), MY_ACCOUNT_SETTINGS.getValue());
-  }
-
-  /**
-   * Navigates the user to the My Vehicles section from the Home screen.
-   */
-  @Step("User navigates to My Vehicles")
-  public void goToMyVehiclesFromHome() {
-    goToMyProfileFromHome();
-    click(myProfileLoggedScreen.getBtnMyVehicles(), MY_VEHICLES.getValue());
+    return new MyLoggedProfileTask();
   }
 
   /**
@@ -78,12 +45,39 @@ public class HomeTasks extends HomeScreen {
   @Step("User switches to As a concert fan theme")
   public void changeToTheConcertFanTheme() {
     click(getBtnThemeSwitch(), THEME_SWITCH.getValue());
-    click(getBtnSwitchToConcertFan(), SWITCH_CONCERT_FAN.getValue());
-    waitForElementNotVisibleOrDisabled(3, getBtnSwitchToConcertFan());
+    click(getBtnSwitchToConcertFan(), CONCERT_FAN.getValue());
   }
 
+  /**
+   * Go to Ticket list screen based on selected theme
+   */
   public void goToTickets() {
+    String actualTheme = getTestContext().getOrDefault(SELECTED_THEME.name(), CLIPPERS_FAN.name());
     click(getBtnMenu(), MENU.getValue());
-    click(menuScreen.getBtnTickets(), TICKETS.getValue());
+    swipeElementToTheBorder(TOP_PAGE, getMenuWidget().getMenuButton(HOME.name()));
+    if (actualTheme.equals(CONCERT_FAN.name()))
+      click(getMenuWidget().getMenuButton(EVENTS.name()), EVENTS.getValue());
+    else
+      click(getMenuWidget().getMenuButton(TICKETS.name()), TICKETS.getValue());
+  }
+
+  /**
+   * Validate if home screen is displayed after restarting the app
+   *
+   * @return boolean
+   */
+  public boolean isHomeDisplayed() {
+    return isTheElementVisible(getBtnProfile(), 15);
+  }
+
+  /**
+   * This method navigates back until home screen
+   */
+  public void goBackUntilHomeScreenIsDisplayed() {
+    for (int i = 0; i < 6; i++) {
+      if (isTheElementVisible(getBtnProfile(), 3))
+        break;
+      commonTask.clickOnBackButton();
+    }
   }
 }

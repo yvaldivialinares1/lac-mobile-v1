@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Regression Android 11 - Samsung Galaxy S21" parallel="tests" thread-count="6">
+    <parameter name="framework.platform.name" value="Android"></parameter>
+    <parameter name="framework.platform.version" value="11.0"></parameter>
+    <parameter name="framework.device.name" value="Samsung Galaxy S21"></parameter>
+    <test verbose="1" name="FanAppRunnerTest">
+        <classes>
+            <class name="runner.FanAppRunnerTest"></class>
+        </classes>
+    </test>
+</suite>

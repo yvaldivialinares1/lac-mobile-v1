@@ -15,27 +15,25 @@ import lombok.Setter;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccountSeatsResponse {
-  public int accountId;
-  public List<Tickets> tickets;
+  private int accountId;
+  private List<Tickets> tickets;
 
   @NoArgsConstructor
   @Data
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class Tickets {
-    public int eventId;
-    public List<Seats> seats;
+    private int eventId;
+    private List<Seats> seats;
 
     @NoArgsConstructor
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Seats {
-      public String sectionName;
-      public String rowName;
-      public int seatNum;
-      public int lastSeat;
-      public int numSeats;
-
+      private String sectionName;
+      private String rowName;
+      private int seatNum;
+      private int lastSeat;
+      private int numSeats;
     }
   }
-
 }

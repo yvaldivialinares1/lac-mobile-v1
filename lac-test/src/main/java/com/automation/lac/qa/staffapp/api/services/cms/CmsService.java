@@ -5,6 +5,7 @@ import static org.apache.http.HttpStatus.SC_OK;
 
 import com.automation.lac.qa.rest.Request;
 import com.automation.lac.qa.rest.Response;
+import com.automation.lac.qa.staffapp.api.models.cms.ClosingIssueResponse;
 import com.automation.lac.qa.staffapp.api.models.cms.CountryCodesResponse;
 import io.qameta.allure.Step;
 import lombok.experimental.UtilityClass;
@@ -17,7 +18,7 @@ public class CmsService {
    * GET list of All Country Codes
    */
   @Step("GET - getAllCountryCodesConfig")
-  public CountryCodesResponse getAllCountryCodesOptions() {
+  public static CountryCodesResponse getAllCountryCodesOptions() {
     Response response = new Request()
       .baseUri(CMS_URI)
       .get("getAllCountryCodesConfig");
@@ -25,5 +26,20 @@ public class CmsService {
     Assert.assertEquals(response.getResponse().statusCode(), SC_OK,
       response.getResponse().getBody().asString());
     return response.getResponse().as(CountryCodesResponse.class);
+  }
+
+  /**
+   * GET list of finish issue options
+   *
+   * @return ClosingIssueResponse
+   */
+  public static ClosingIssueResponse getClosingIssuePreloadedOptions() {
+    Response response = new Request()
+      .baseUri(CMS_URI)
+      .get("getClosingIssueReasons");
+
+    Assert.assertEquals(response.getResponse().statusCode(), SC_OK,
+      response.getResponse().getBody().asString());
+    return response.getResponse().as(ClosingIssueResponse.class);
   }
 }

@@ -2,7 +2,8 @@ package com.automation.lac.qa.fanapp.mobile.tasks.identitycreateanaccount.educat
 
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.LIVE_THE_FULL_EXPERIENCE;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
-import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementToBeClickable;
+import static com.automation.lac.qa.utils.mobile.WaitActions.isTheElementVisible;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementAttributeContainsValue;
 
 import com.automation.lac.qa.fanapp.mobile.screens.identitycreateanaccount.educationalexperience.FullExperienceEducationalScreen;
 
@@ -12,8 +13,13 @@ public class FullExperienceEducationalTask extends FullExperienceEducationalScre
    * Start the Live Full Experience on FanApp
    */
   public CreateAccountEducationalTask liveTheFullExperience() {
-    waitForElementToBeClickable(5, getBtnLiveTheFullExperience());
-    click(getBtnLiveTheFullExperience(), LIVE_THE_FULL_EXPERIENCE.getValue());
+    if (isTheElementVisible(getBtnLiveTheFullExperience(), 10)) {
+      if (!isAndroid()) {
+        waitForElementAttributeContainsValue(getBtnLiveTheFullExperience(),
+          "accessible", "true", 10);
+      }
+      click(getBtnLiveTheFullExperience(), LIVE_THE_FULL_EXPERIENCE.getValue());
+    }
     return new CreateAccountEducationalTask();
   }
 }

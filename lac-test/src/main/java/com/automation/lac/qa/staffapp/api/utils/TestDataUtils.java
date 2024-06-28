@@ -1,11 +1,14 @@
 package com.automation.lac.qa.staffapp.api.utils;
 
+import static com.automation.lac.qa.faker.enums.FanType.MINI;
 import static java.lang.Boolean.FALSE;
 
 import com.automation.lac.qa.faker.enums.FanType;
 import com.automation.lac.qa.faker.enums.VehicleModel;
-import com.automation.lac.qa.faker.models.VehicleInfo;
+import com.automation.lac.qa.faker.models.userinfo.VehicleInfo;
+import com.automation.lac.qa.staffapp.api.models.identity.CreateMiniIntuitDomeAccountDto;
 import com.automation.lac.qa.staffapp.api.models.identity.NewIntuitDomeAccountDto;
+import com.automation.lac.qa.staffapp.api.models.identity.NfcRelationship;
 import com.automation.lac.qa.utils.Toolbox;
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -29,7 +32,7 @@ public class TestDataUtils {
    * @param type The type of fan which determines the age range for the birthdate.
    * @return A NewIntuitDomeAccountDto object populated with random data.
    */
-  public NewIntuitDomeAccountDto createRandomNewIntuitDomeAccountDto(FanType type) {
+  public static NewIntuitDomeAccountDto createRandomNewIntuitDomeAccountDto(FanType type) {
     LocalDate birthDate = FAKER.date().birthday(type.getMinAge(), type.getMaxAge()).toInstant()
       .atZone(ZoneId.systemDefault())
       .toLocalDate();
@@ -60,12 +63,47 @@ public class TestDataUtils {
   }
 
   /**
+   * Creates a random CreateMiniIntuitDomeAccountDto object.
+   *
+   * @param intuitDomeAccountId id of parent account.
+   * @return A CreateMiniIntuitDomeAccountDto object populated with random data.
+   */
+  public static CreateMiniIntuitDomeAccountDto createRandomCreateMiniIntuitDomeAccountDto(
+    String intuitDomeAccountId) {
+    long birthDate = FAKER.date().birthday(MINI.getMinAge(), MINI.getMaxAge()).toInstant()
+      .atZone(ZoneId.systemDefault())
+      .toEpochSecond();
+
+    return CreateMiniIntuitDomeAccountDto.builder()
+      .intuitDomeAccountId(intuitDomeAccountId)
+      .firstName(FAKER.name().firstName())
+      .lastName(FAKER.name().lastName())
+      .chosenName(FAKER.name().title())
+      .dateOfBirth(birthDate)
+      .build();
+  }
+
+  /**
+   * Creates a random NfcRelationship object.
+   *
+   * @param accountId id of fan account.
+   * @return A NfcRelationship object populated with random data.
+   */
+  public static NfcRelationship createRandomNfcRelationship(String accountId) {
+    return NfcRelationship.builder()
+      .id(FAKER.regexify("[a-zA-Z0-9]{12}"))
+      .accountId(accountId)
+      .memberType("FAN")
+      .build();
+  }
+
+  /**
    * Generates a random VehicleInfo object.
    *
    * @param numberOfVehicles int indication the expected amount of vehicles generated
    * @return A list of VehicleInfo object populated with random data.
    */
-  public List<VehicleInfo> createRandomVehicles(int numberOfVehicles) {
+  public static List<VehicleInfo> createRandomVehicles(int numberOfVehicles) {
     int randomIndex = random.nextInt(VEHICLE_MAKES.length);
     String make = VEHICLE_MAKES[randomIndex];
     List<VehicleInfo> vehicles = new ArrayList<>();

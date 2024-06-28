@@ -9,15 +9,15 @@ import org.openqa.selenium.WebElement;
 @Getter
 public class TeammateAccountsEducationalScreen extends MobileBaseScreen {
 
-  @AndroidFindBy(uiAutomator = "resourceId(\"ivEmptyTeammateAccountImage\")")
+  @AndroidFindBy(id = "ivEmptyTeammateAccountImage")
   @iOSXCUITFindBy(iOSNsPredicate = "name BEGINSWITH 'img_'")
   private WebElement imgTeammateAccountsLogo;
 
-  @AndroidFindBy(uiAutomator = "resourceId(\"tvTeammateAccountEmptyTitle\")")
-  @iOSXCUITFindBy(accessibility = "id_label_title_id")
+  @AndroidFindBy(id = "tvTeammateAccountEmptyTitle")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_label_title_id'")
   private WebElement lblTeammateAccountsTitle;
 
-  @AndroidFindBy(uiAutomator = "resourceId(\"btnAdd Teammate To Your Profile\")")
+  @AndroidFindBy(id = "btnAdd Teammate Account")
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'ADD TEAMMATE ACCOUNT' AND type CONTAINS 'Button'")
   private WebElement btnAddTeammate;
 

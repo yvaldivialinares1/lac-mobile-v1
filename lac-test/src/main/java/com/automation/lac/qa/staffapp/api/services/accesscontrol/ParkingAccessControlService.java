@@ -18,11 +18,12 @@ public class ParkingAccessControlService {
 
   /**
    * GET the parking lanes
+   *
    * @param garage String indicating the garage for which we get the lines.
    * @return LanesResponse
    */
   @Step("GET - access-control/v1/parking/lanes?garage={garage}")
-  public LanesResponse getParkingLines(String garage) {
+  public static LanesResponse getParkingLines(String garage) {
     Response response = new Request()
       .baseUri(BACK_BASE_URI)
       .queryParam("garage", garage)
@@ -35,10 +36,11 @@ public class ParkingAccessControlService {
 
   /**
    * POST new parking access validation event
+   *
    * @param request ParkingAccessValidationRequest indicating the request data.
    */
   @Step("POST - access-control/v1/parking/lpr-events")
-  public void createParkingAccessValidationEvent(ParkingAccessValidationRequest request) {
+  public static void createParkingAccessValidationEvent(ParkingAccessValidationRequest request) {
     Response response = new Request()
       .baseUri(BACK_BASE_URI)
       .header("X-API-KEY", HEADER_PARKING_API_KEY)

@@ -11,11 +11,10 @@ public class StartYourJourneyScreen extends MobileBaseScreen {
 
   @AndroidFindBy(xpath =
     "//android.widget.TextView[contains(normalize-space(@text), 'EMAIL ADDRESS')]/../..")
-  @iOSXCUITFindBy(iOSNsPredicate = "name == \"id_input_email_field\" AND "
-    + "label == \"EMAIL ADDRESS, required input\" AND type == \"XCUIElementTypeTextField\"")
-  WebElement txtEmailAddress;
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_input_email_field' AND type CONTAINS 'TextField'")
+  private WebElement txtEmailAddress;
 
   @AndroidFindBy(uiAutomator = "new UiSelector().textContains(\"CREATE ACCOUNT\")")
-  @iOSXCUITFindBy(iOSNsPredicate = "name == \"primary_brush_button\"")
-  WebElement btnCreateAccount;
+  @iOSXCUITFindBy(accessibility = "id_btn_create_account_ds_button")
+  private WebElement btnCreateAccount;
 }

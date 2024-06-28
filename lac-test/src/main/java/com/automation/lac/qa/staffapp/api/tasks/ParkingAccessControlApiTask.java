@@ -1,8 +1,8 @@
 package com.automation.lac.qa.staffapp.api.tasks;
 
+import static com.automation.lac.qa.staffapp.constants.ContextConstants.ADULT_INTUIT_DOME_ACCOUNT;
 import static com.automation.lac.qa.staffapp.constants.ContextConstants.DEVICE_ID;
 import static com.automation.lac.qa.staffapp.constants.ContextConstants.GARAGE_CATEGORY;
-import static com.automation.lac.qa.staffapp.constants.ContextConstants.INTUIT_DOME_ACCOUNT_1;
 import static com.automation.lac.qa.staffapp.constants.ContextConstants.LICENCE_PLATE;
 import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 
@@ -25,7 +25,7 @@ public class ParkingAccessControlApiTask {
    * @param garage String indicating the garage for which we get the actual lines.
    * @return LanesResponse
    */
-  public LanesResponse getParkingLines(String garage) {
+  public static LanesResponse getParkingLines(String garage) {
     return ParkingAccessControlService.getParkingLines(garage);
   }
 
@@ -34,7 +34,7 @@ public class ParkingAccessControlApiTask {
    *
    * @param queueEventType QueueEventType indicating the type of event.
    */
-  public void createParkingAccessValidationEvent(QueueEventType queueEventType) {
+  public static void createParkingAccessValidationEvent(QueueEventType queueEventType) {
     String licensePlatePhoto = FileUtil.getBase64DecodedString(
       "src/test/resources/test_data/staffapp/file/parking_access_event.png");
 
@@ -42,6 +42,7 @@ public class ParkingAccessControlApiTask {
     final GarageCategoryType garageCategory = getTestContext().get(GARAGE_CATEGORY);
     final LicensePlateDto licensePlate = getTestContext().get(LICENCE_PLATE);
     IntuitDomeAccountDto account;
+    String tmUserId;
 
     int confidence;
     switch (queueEventType) {
@@ -49,10 +50,10 @@ public class ParkingAccessControlApiTask {
         confidence = 50;
         break;
       case INCORRECT_GARAGE:
-        account = getTestContext().get(INTUIT_DOME_ACCOUNT_1);
+        account = getTestContext().get(ADULT_INTUIT_DOME_ACCOUNT);
         confidence = 90;
-        String tmUserId = TicketingApiTask.generateTicketMasterUserId(account);
-        IntuitDomeAccountApiTask.addTicketingIdToIntuitDomAccount(account.getId(), tmUserId);
+        tmUserId = TicketingApiTask.generateTicketMasterUserId(account);
+        TicketingApiTask.addTicketingIdToIntuitDomAccount(account.getId(), tmUserId);
         TicketingApiTask.setUpTicketingMockResponse(
           tmUserId,
           "FAILURE",
@@ -76,10 +77,10 @@ public class ParkingAccessControlApiTask {
    * @param confidence        String indicating plate visibility.
    * @param licensePlatePhoto String indicating base 64 decoded string of car photo.
    */
-  private void sendParkingAccessValidationEvent(LicensePlateDto licensePlate,
-                                                GarageCategoryType garageCategory,
-                                                String deviceId, int confidence,
-                                                String licensePlatePhoto) {
+  private static void sendParkingAccessValidationEvent(LicensePlateDto licensePlate,
+                                                       GarageCategoryType garageCategory,
+                                                       String deviceId, int confidence,
+                                                       String licensePlatePhoto) {
     ParkingAccessValidationRequest request = ParkingAccessValidationRequest.builder()
       .licensePlate(licensePlate.getLicensePlate())
       .state(licensePlate.getState())

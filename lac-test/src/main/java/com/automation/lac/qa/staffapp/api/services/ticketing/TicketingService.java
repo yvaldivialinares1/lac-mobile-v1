@@ -2,9 +2,11 @@ package com.automation.lac.qa.staffapp.api.services.ticketing;
 
 import static com.automation.lac.qa.staffapp.constants.ServiceConstants.BACK_BASE_URI;
 import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 
 import com.automation.lac.qa.rest.Request;
 import com.automation.lac.qa.rest.Response;
+import com.automation.lac.qa.staffapp.api.models.identity.TicketingIdRequestDto;
 import com.automation.lac.qa.staffapp.api.models.ticketing.MockRedeemRequestV2;
 import com.automation.lac.qa.staffapp.api.models.ticketing.TicketMasterUserIdRequest;
 import com.automation.lac.qa.staffapp.api.models.ticketing.TicketMasterUserIdResponse;
@@ -22,7 +24,7 @@ public class TicketingService {
    * @param request MockRedeemRequestV2 indicating the request data.
    */
   @Step("POST - ticketing/v2/add/redeem")
-  public void setUpTicketingMockResponseV2(MockRedeemRequestV2 request) {
+  public static void setUpTicketingMockResponseV2(MockRedeemRequestV2 request) {
     Response response = new Request()
       .baseUri(BACK_BASE_URI)
       .contentType(ContentType.JSON)
@@ -40,7 +42,8 @@ public class TicketingService {
    * @return TicketMasterUserIdResponse
    */
   @Step("POST - ticketing/v1/accounts")
-  public TicketMasterUserIdResponse generateTicketMasterUserId(TicketMasterUserIdRequest request) {
+  public static TicketMasterUserIdResponse generateTicketMasterUserId(
+    TicketMasterUserIdRequest request) {
     Response response = new Request()
       .baseUri(BACK_BASE_URI)
       .contentType(ContentType.JSON)
@@ -50,5 +53,23 @@ public class TicketingService {
     Assert.assertEquals(response.getResponse().statusCode(), SC_CREATED,
       response.getResponse().getBody().asString());
     return response.getResponse().as(TicketMasterUserIdResponse.class);
+  }
+
+  /**
+   * POST link ticket master id to a fan account.
+   *
+   * @param request TicketingIdRequestDto indicating the request data.
+   */
+  @Step("POST - identity/v1/intuit-dome-account/ticket-master/id")
+  public static void addTicketingIdToIntuitDomeAccount(
+    TicketingIdRequestDto request) {
+    Response response = new Request()
+      .baseUri(BACK_BASE_URI)
+      .contentType(ContentType.JSON)
+      .body(request)
+      .post("identity/v1/intuit-dome-account/ticket-master/id");
+
+    Assert.assertEquals(response.getResponse().statusCode(), SC_NO_CONTENT,
+      response.getResponse().getBody().asString());
   }
 }

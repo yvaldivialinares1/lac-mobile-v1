@@ -4,6 +4,9 @@ import com.automation.lac.qa.faker.models.userinfo.AccountInfo;
 import com.automation.lac.qa.faker.models.userinfo.AddressInfo;
 import com.automation.lac.qa.faker.models.userinfo.PersonalInfo;
 import com.automation.lac.qa.faker.models.userinfo.PhoneInfo;
+import com.automation.lac.qa.faker.models.userinfo.TeammateInfo;
+import com.automation.lac.qa.faker.models.userinfo.VehicleInfo;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,4 +26,6 @@ public class UserInfo {
   private AccountInfo accountInfo;
   private PhoneInfo phoneInfo;
   private AddressInfo billingAddress;
+  private List<TeammateInfo> teammatesInfo;
+  private List<VehicleInfo> vehiclesInfo;
 }

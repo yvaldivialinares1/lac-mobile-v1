@@ -4,8 +4,7 @@
     <parameter name="framework.platform.name" value="iOS"></parameter>
     <parameter name="framework.platform.version" value="16"></parameter>
     <parameter name="framework.device.name" value="iPhone 14 Plus"></parameter>
-    <parameter name="framework.mobile.app" value="StaffAppIosLts"></parameter>
-    <test verbose="1" name="Sample">
+    <test verbose="1" name="StaffAppRunnerTest">
         <classes>
             <class name="runner.StaffAppRunnerTest"></class>
         </classes>

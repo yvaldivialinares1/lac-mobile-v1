@@ -35,7 +35,7 @@ public class MagnifAiTasks {
    */
   public void flexibleSearchImage(String parentImage, List<String> childImage) {
     takeMagnifAiScreenshot(parentImage);
-    childImage.forEach(image -> {
+    childImage.forEach(image ->
       Allure.step("Flexible search image:" + image, step -> {
         File parentImageFile = new File(SCREENSHOTS_FOLDER.getText() + parentImage);
         File childImageFile = new File(IMAGE_FOLDER.getText() + image);
@@ -46,8 +46,8 @@ public class MagnifAiTasks {
           MagnifAiApi.getAsset(flexibleSearchImage.getFlexSearch().getResultImageRef())));
         boolean result = flexibleSearchImage.getStatus().equals(FOUND.getText());
         getSoftAssert().assertTrue(result, "Flexible image search");
-      });
-    });
+      })
+    );
   }
 
   /**
@@ -58,7 +58,7 @@ public class MagnifAiTasks {
    */
   public void flexibleCompareImage(String baselineImage, List<String> inputImage) {
     takeMagnifAiScreenshot(baselineImage);
-    inputImage.forEach(image -> {
+    inputImage.forEach(image ->
       Allure.step("Flexible compare images: " + image, stepContext -> {
         File baseImage = new File(SCREENSHOTS_FOLDER.getText() + baselineImage);
         File inpImage = new File(IMAGE_FOLDER.getText() + image);
@@ -70,7 +70,7 @@ public class MagnifAiTasks {
           MagnifAiApi.getAsset(flexibleImageComparisonResponse.getFlexCompare().getResultImage())));
         boolean result = flexibleImageComparisonResponse.getStatus().equals(PASSED.getText());
         getSoftAssert().assertTrue(result, "Flexible image comparison");
-      });
-    });
+      })
+    );
   }
 }

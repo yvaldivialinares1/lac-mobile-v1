@@ -10,11 +10,11 @@ import org.openqa.selenium.WebElement;
 public class WelcomeHomeScreen extends MobileBaseScreen {
 
   @AndroidFindBy(accessibility = "Create an account")
-  @iOSXCUITFindBy(accessibility = "primary_brush_button")
+  @iOSXCUITFindBy(accessibility = "primary_rectangle_button")
   private WebElement btnCreateAnAccount;
 
-  @iOSXCUITFindBy(iOSClassChain = "//XCUIElementTypeOther[starts-with(@label, 'Skip, button')]")
   @AndroidFindBy(xpath = "//android.widget.TextView[@text='Skip']/..")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_btn_navigation_option_skip_with_text'")
   private WebElement btnSkip;
 
   @AndroidFindBy(uiAutomator = "descriptionContains(\"Google button\")")

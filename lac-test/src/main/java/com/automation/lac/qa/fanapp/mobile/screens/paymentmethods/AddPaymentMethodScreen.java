@@ -1,13 +1,11 @@
 package com.automation.lac.qa.fanapp.mobile.screens.paymentmethods;
 
-import static com.automation.lac.qa.utils.mobile.DeviceActions.getElement;
-
+import com.automation.lac.qa.fanapp.mobile.screens.commons.components.SelectCountryWidget;
+import com.automation.lac.qa.fanapp.mobile.screens.commons.components.SelectStateWidget;
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
-import java.util.List;
 import lombok.Getter;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 @Getter
@@ -37,11 +35,11 @@ public class AddPaymentMethodScreen extends MobileBaseScreen {
     + "label == \"NAME ON CARD, required input\" AND type == \"XCUIElementTypeTextField\"")
   private WebElement txtNameOnCard;
 
-  @AndroidFindBy(uiAutomator = "resourceId(\"addCardButton\")")
+  @AndroidFindBy(xpath = "//*[@resource-id='btnADD CARD' or @resource-id='btnCONTINUE']")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeOther[contains(@name,'id_btn_')]/XCUIElementTypeButton")
   private WebElement btnContinueOrAddCard;
 
-  @AndroidFindBy(uiAutomator = "description(\"Select to autofill with my existing data\")")
+  @AndroidFindBy(id = "cbAutoFillAddress")
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'Autofill with my existing data'")
   private WebElement chkAutofill;
 
@@ -52,11 +50,11 @@ public class AddPaymentMethodScreen extends MobileBaseScreen {
   private WebElement txtStreetAddress;
 
   @iOSXCUITFindBy(accessibility = "id_dropdown_input_country_field")
-  @AndroidFindBy(uiAutomator = ".resourceId(\"dlCountry\")")
+  @AndroidFindBy(id = "dlCountry")
   private WebElement dpdCountry;
 
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_dropdown_input_state_field'")
-  @AndroidFindBy(uiAutomator = ".resourceId(\"dlState\")")
+  @AndroidFindBy(id = "dlState")
   private WebElement dpdState;
 
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_input_city_field' AND type == "
@@ -71,20 +69,11 @@ public class AddPaymentMethodScreen extends MobileBaseScreen {
     + ".childSelector(className(\"android.widget.EditText\"))")
   private WebElement txtZipCode;
 
-  @AndroidFindBy(xpath = "//android.view.View[@content-desc=\"Search\"]/..")
-  @iOSXCUITFindBy(iOSNsPredicate = "name CONTAINS 'Search'")
-  private WebElement txtSearch;
+  @AndroidFindBy(xpath = "//android.view.View[@content-desc='Search']/../../..")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'Clippers + ID-STG'")
+  private SelectStateWidget selectStateWidget;
 
-  @iOSXCUITFindBy(iOSNsPredicate = "name BEGINSWITH 'id_country'")
-  private List<WebElement> lblCountryList;
-
-  @iOSXCUITFindBy(iOSNsPredicate = "name BEGINSWITH 'id_state'")
-  private List<WebElement> lblStatesList;
-
-  protected static final String XPATH_EXPECTED_OPTION = "//android.view.View[@content-desc='%s']";
-
-  protected WebElement selectOption(String expectedOption) {
-    return getElement(By.xpath(String.format(XPATH_EXPECTED_OPTION, expectedOption)));
-  }
-
+  @AndroidFindBy(xpath = "//android.view.View[@content-desc='Search']/../../..")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'Clippers + ID-STG'")
+  private SelectCountryWidget selectCountryWidget;
 }

@@ -33,9 +33,22 @@ public class TestContext {
   public <T> T get(String key) {
     if (!testData.containsKey(key)) {
       throw new CustomException(
-        "The specified key : " + key + " does not exist in the test context");
+        "The specified key '" + key + "' does not exist in the test context");
     }
     return (T) testData.get(key);
+  }
+
+  /**
+   * Removes a value according to the given key
+   *
+   * @throws IllegalArgumentException if the key is not present in the test context.
+   */
+  public void remove(String key) {
+    if (!testData.containsKey(key)) {
+      throw new CustomException(
+        "The specified key '" + key + "' does not exist in the test context");
+    }
+    testData.remove(key);
   }
 
   /**
@@ -52,6 +65,7 @@ public class TestContext {
 
   /**
    * Checks if the test context contains a data entry associated with the specified key.
+   *
    * @param key the key whose presence in the test context is to be checked
    * @return {@code true} if the test context contains a mapping for the specified key,
    */

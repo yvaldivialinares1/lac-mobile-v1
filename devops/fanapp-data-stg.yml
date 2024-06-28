@@ -1,0 +1,167 @@
+trigger: none
+
+variables:
+  - group: test-apk_secret
+
+parameters:
+  - name: FAN_TYPE
+    displayName: Which User Type do you want to create?
+    type: string
+    default: 'ADULT'
+    values:
+      - MINI
+      - MINOR_ADULT
+      - YOUNG_ADULT
+      - ADULT
+      - ALL_ADULT
+  - name: FANS_NUMBER
+    displayName: How many users do you want to create?
+    type: number
+    default: 10
+  - name: PAYMENT_METHOD
+    displayName: Create users with Payment Method
+    type: boolean
+    default: 'false'
+    values:
+      - true
+      - false
+  - name: MINI_ACCOUNT
+    displayName: Create users with Mini Account
+    type: boolean
+    default: 'false'
+    values:
+      - true
+      - false
+  - name: VEHICLE
+    displayName: Create users with vehicles
+    type: boolean
+    default: 'false'
+    values:
+      - true
+      - false
+  - name: TICKET_PURCHASE
+    displayName: Create users with tickets
+    type: boolean
+    default: 'false'
+    values:
+      - true
+      - false
+
+name: FanApp-user-creation-stg
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+  - job: AutomationTest
+    displayName: 'Automation Test'
+    timeoutInMinutes: 180
+    steps:
+      - script: |
+          echo "##vso[task.setvariable variable=slackMessage;]Deploy for service *${BUILD_DEFINITIONNAME}* is starting requested by ${BUILD_REQUESTEDFOR} \n*PR*: ${BUILD_SOURCEVERSIONMESSAGE}"
+        displayName: 'Collected results'
+
+      - task: PowerShell@2
+        inputs:
+          filePath: './devops/notification.ps1'
+        env:
+          slackMessage: $(slackMessage)
+          Slack_WebHook: $(Slack_WebHook1)
+          status: "initial"
+        displayName: 'Slack Message'
+
+      - task: JavaToolInstaller@0
+        inputs:
+          versionSpec: '17'
+          jdkArchitectureOption: 'x64'
+          jdkSourceOption: 'PreInstalled'
+
+      - task: NodeTool@0
+        inputs:
+          versionSource: 'spec'
+          versionSpec: '10.x'
+        displayName: 'Install Nodejs'
+
+      - script: |
+          mvn install -DskipTests
+        displayName: 'mvn install'
+
+      - script: |
+          if [ ${{ parameters.FANS_NUMBER }} -lt 1 ] || [ ${{ parameters.FANS_NUMBER }} -gt 100 ]; then
+            echo "FANS_NUMBER is out of range. Setting to default value 10."
+            echo "##vso[task.setvariable variable=FANS_NUMBER;]10"
+          else
+            echo "FANS_NUMBER is within the valid range."
+            echo "##vso[task.setvariable variable=FANS_NUMBER;]${{ parameters.FANS_NUMBER }}"
+          fi
+          cd lac-test
+          mvn clean test \
+          -Dframework.platform.name=Android \
+          -Dframework.platform.version="13.0" \
+          -Dframework.device.name="Google Pixel 6 Pro" \
+          -Dframework.mobile.app.version="UnknownAppVersion" \
+          -Denvironment=stg \
+          -Dcucumber.filter.tags="@user_creation" \
+          -DthreadCount=2 \
+          -Dframework.mobile.app=FanAppUserCreationStgAndroidLts \
+          -Dfanapp.usercreation.ticket=${{parameters.TICKET_PURCHASE}} \
+          -Dfanapp.usercreation.vehicle=${{parameters.VEHICLE}} \
+          -Dfanapp.usercreation.miniaccount=${{parameters.MINI_ACCOUNT}} \
+          -Dfanapp.usercreation.paymentmethod=${{parameters.PAYMENT_METHOD}} \
+          -Dfanapp.usercreation.number=${{parameters.FANS_NUMBER}} \
+          -Dfanapp.usercreation.usertype=${{parameters.FAN_TYPE}}
+        continueOnError: true
+        displayName: 'Run Tests'
+
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          buildType: 'specific'
+          project: 'f989e8df-6bbf-44cc-af3e-43a80cc02b9a'
+          pipeline: '270'
+          buildVersionToDownload: 'latestFromBranch'
+          branchName: $(Build.SourceBranch)
+          allowPartiallySucceededBuilds: true
+          tags: 'user-creation'
+          artifactName: 'allure-history'
+          targetPath: '$(System.DefaultWorkingDirectory)/lac-test/allure-results/history'
+        displayName: 'Download Allure History'
+        continueOnError: true
+
+      - task: qameta.allure-azure-pipelines.PublishAllureReport.PublishAllureReport@1
+        inputs:
+          testResultsDir: lac-test/allure-results
+          allureVersion: '2.27.0'
+          reportName: 'Allure Report'
+        displayName: 'Publish Allure Report'
+
+      - script: |
+          npm install -g allure-commandline --save-dev
+          npx allure generate $(System.DefaultWorkingDirectory)/lac-test/allure-results -o $(System.DefaultWorkingDirectory)/lac-test/allure-web --clean
+        displayName: 'Generate Manual Report'
+
+      - publish: $(System.DefaultWorkingDirectory)/lac-test/allure-web/history
+        artifact: allure-history
+        displayName: 'Publish Allure History'
+
+      - task: PowerShell@2
+        displayName: 'Add Build Tag'
+        inputs:
+          targetType: 'inline'
+          script: 'Write-Host "##vso[build.addbuildtag]user-creation"'
+
+      - script: |
+          cd lac-test/allure-web/widgets
+          summary=$(<summary.json jq -r '.statistic')
+          more_info="<https://dev.azure.com/IntuitDome/${SYSTEM_TEAMPROJECT}/_build/results?buildId=${BUILD_BUILDID} |${BUILD_BUILDNUMBER}>"
+          total=$(jq -r '.total' <<<"$summary")
+          echo "##vso[task.setvariable variable=slackMessage;]Automated test executed from branch *${BUILD_SOURCEBRANCHNAME}* and platform Android. \n*More info:* '$more_info' $total cases executed. \n*Results* \n:check-failed:*Failed*: $(jq -r '.failed' <<<"$summary") :construction:*Broken*: $(jq -r '.broken' <<<"$summary") :jenkins-yellow:*Skipped*: $(jq -r '.skipped' <<<"$summary") :check-passed:*Passed*: $(jq -r '.passed' <<<"$summary") :gear:*Unknown*: $(jq -r '.unknown' <<<"$summary")"
+        displayName: 'Collected results'
+
+      - task: PowerShell@2
+        inputs:
+          filePath: './devops/notification.ps1'
+        env:
+          slackMessage: $(slackMessage)
+          Slack_WebHook: $(Slack_WebHook1)
+          status: "final"
+        displayName: 'Slack Message'

@@ -1,7 +1,6 @@
 package com.automation.lac.qa.fanapp.mobile.tasks.myprofile;
 
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.BACK;
-import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.LOG_OUT;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.MY_IDENTITY;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.PASSWORD_SECURITY;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.PERSONAL_INFORMATION;
@@ -10,12 +9,9 @@ import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.TEAMM
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
 
 import com.automation.lac.qa.fanapp.mobile.screens.myprofile.MyAccountSettingsScreen;
-import com.automation.lac.qa.fanapp.mobile.tasks.modals.ModalLogOutTasks;
 import com.automation.lac.qa.fanapp.mobile.tasks.paymentmethods.MyPaymentMethodsTask;
 
-
 public class MyAccountSettingsTasks extends MyAccountSettingsScreen {
-  private final ModalLogOutTasks modalLogOutTasks = new ModalLogOutTasks();
   private final MyLoggedProfileTask myProfileLoggedTasks = new MyLoggedProfileTask();
   private final MyPaymentsTask myPaymentsTask = new MyPaymentsTask();
   private final MyPaymentMethodsTask myPaymentMethodsTask = new MyPaymentMethodsTask();
@@ -53,19 +49,6 @@ public class MyAccountSettingsTasks extends MyAccountSettingsScreen {
     }
   }
 
-  public void clickOnLogOut() {
-    click(getBtnLogOut(), LOG_OUT.getValue());
-  }
-
-  /**
-   * Initiates the user logout sequence.
-   * It accesses account settings, initiates logout, and confirms via modal dialog.
-   */
-  public void logoutFromTheApp() {
-    clickOnLogOut();
-    modalLogOutTasks.clickOnLogOutButton();
-  }
-
   /**
    * Navigates back to the user's profile from the account settings screen.
    */
@@ -80,6 +63,15 @@ public class MyAccountSettingsTasks extends MyAccountSettingsScreen {
   public void goToMyAccountSettingsFromMyPaymentMethodsManagement() {
     myPaymentMethodsTask.goToMyPaymentsFromMyPaymentMethods();
     myPaymentsTask.goToMyProfileFromMyPayments();
-    myProfileLoggedTasks.goToMyAccountSettingsFromMyProfile();
+    myProfileLoggedTasks.goToMyAccountSettings();
+  }
+
+  /**
+   * Transitions to the My Profile from the payment methods management interface.
+   * It navigates through payments to the user's profile and then to My Profile.
+   */
+  public void goToMyProfileFromMyPaymentMethodsManagement() {
+    myPaymentMethodsTask.goToMyPaymentsFromMyPaymentMethods();
+    myPaymentsTask.goToMyProfileFromMyPayments();
   }
 }

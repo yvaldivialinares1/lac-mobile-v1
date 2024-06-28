@@ -20,6 +20,26 @@
     "active": true
   },
   {
+    "brand": "Mastercard",
+    "cardNumber": 5112345112345114,
+    "name": "MC TESTSPT CARD C",
+    "securityCode": 123,
+    "expirationDate": "0228",
+    "type": "DEBIT",
+    "used": false,
+    "active": true
+  },
+  {
+    "brand": "Mastercard",
+    "cardNumber": 5111005111051128,
+    "name": "MC TESTSPT CARD D",
+    "securityCode": 123,
+    "expirationDate": "0228",
+    "type": "DEBIT",
+    "used": false,
+    "active": true
+  },
+  {
     "brand": "Visa",
     "cardNumber": 4761220000000237,
     "name": "VI TESTSPT CARD A",
@@ -77,7 +97,7 @@
     "expirationDate": "0228",
     "type": "DEBIT",
     "used": false,
-    "active": true
+    "active": false
   },
   {
     "brand": "American Express",
@@ -87,7 +107,7 @@
     "expirationDate": "0228",
     "type": "DEBIT",
     "used": false,
-    "active": true
+    "active": false
   },
   {
     "brand": "American Express",

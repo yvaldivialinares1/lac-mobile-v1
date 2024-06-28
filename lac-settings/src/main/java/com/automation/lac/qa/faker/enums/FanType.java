@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum FanType {
-  MINI(2, 12), MINOR_ADULT(13, 17), YOUNG_ADULT(18, 20), ADULT(21, 100);
+  MINI(2, 12), MINOR_ADULT(13, 17), YOUNG_ADULT(18, 20), ADULT(21, 100), ALL_ADULT(0, 0);
   private final int minAge;
   private final int maxAge;
 

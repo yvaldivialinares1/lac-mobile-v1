@@ -2,13 +2,14 @@ package com.automation.lac.qa.fanapp.api.models;
 
 import static com.automation.lac.qa.fanapp.api.enums.FilesPath.PAYMENT_METHOD_PATH;
 
+import com.automation.lac.qa.utils.CustomException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 import lombok.Data;
 
@@ -18,7 +19,7 @@ import lombok.Data;
 @Data
 public class PaymentMethodFile {
 
-  private static final Random random = new Random();
+  private static final SecureRandom random = new SecureRandom();
   private List<PaymentMethod> paymentMethods;
 
   @Data
@@ -46,12 +47,13 @@ public class PaymentMethodFile {
     try {
       String jsonContent = new String(Files.readAllBytes(Paths.get(PAYMENT_METHOD_PATH.getText())));
       List<PaymentMethod> paymentMethodList = mapper.readValue(jsonContent,
-        new TypeReference<List<PaymentMethod>>() {});
+        new TypeReference<List<PaymentMethod>>() {
+        });
       PaymentMethodFile paymentMethodFile = new PaymentMethodFile();
       paymentMethodFile.setPaymentMethods(paymentMethodList);
       return paymentMethodFile;
     } catch (IOException e) {
-      throw new RuntimeException("Error reading or deserializing the JSON file: ", e);
+      throw new CustomException("Error reading or deserializing the JSON file.", e);
     }
   }
 

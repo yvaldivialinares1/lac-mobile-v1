@@ -1,6 +1,8 @@
 package com.automation.lac.qa.putsbox;
 
-import static com.automation.lac.qa.driver.AppiumConstants.NEW_COMMAND_TIMEOUT;
+import static com.automation.lac.qa.driver.AppiumConstants.WAIT_TIMEOUT;
+import static com.automation.lac.qa.putsbox.enums.PutsBoxEndPoints.BASE_URL;
+import static com.automation.lac.qa.utils.mobile.WaitActions.createFluentWait;
 import static org.apache.http.HttpStatus.SC_OK;
 
 import com.automation.lac.qa.putsbox.enums.PutsBoxEndPoints;
@@ -8,9 +10,9 @@ import com.automation.lac.qa.putsbox.models.response.EmailDetails;
 import com.automation.lac.qa.rest.Request;
 import com.automation.lac.qa.rest.Response;
 import com.automation.lac.qa.utils.CustomException;
-import com.automation.lac.qa.utils.PropertiesManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
 import java.time.Duration;
 import java.util.List;
@@ -25,16 +27,12 @@ import org.testng.Assert;
 @UtilityClass
 public class PutsBoxApi {
 
-  private static final String BASE_URL =
-    PropertiesManager.getParameter("framework.putsbox.baseurl");
-
   /**
    * Fluent wait instance for managing polling and timeouts during asynchronous operations.
    */
-  private static final FluentWait<Request> WAIT = new FluentWait<>(new Request())
-    .withTimeout(Duration.ofSeconds(NEW_COMMAND_TIMEOUT))
-    .pollingEvery(Duration.ofSeconds(5))
-    .ignoring(NoSuchElementException.class);
+  private static final FluentWait<Request> WAIT =
+    createFluentWait(new Request(), Duration.ofSeconds(WAIT_TIMEOUT), Duration.ofSeconds(5),
+      "Was impossible to get the mail OTP", NoSuchElementException.class);
 
   private static final Pattern OTP_PATTERN = Pattern.compile("\\d{6}");
   private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -49,10 +47,11 @@ public class PutsBoxApi {
    *                               if the email list is empty, or if the OTP code is not found.
    */
   @SneakyThrows
+  @Step("GET - /{email}/inspect")
   public static String getOtpCodeFromEmails(String email) {
     Response result = WAIT.until(request -> {
       Response response = new Request()
-        .baseUri(BASE_URL)
+        .baseUri(BASE_URL.getText())
         .contentType(ContentType.JSON)
         .header("Accept", "application/json")
         .get("/" + email + PutsBoxEndPoints.GET_INSPECT.getText());

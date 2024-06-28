@@ -26,6 +26,6 @@ public class AgeVerificationEducationalScreen extends MobileBaseScreen {
   private WebElement btnBack;
 
   @AndroidFindBy(uiAutomator = "text(\"Skip\")")
-  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_btn_navigation_option_skip_with_text'")
+  @iOSXCUITFindBy(iOSNsPredicate = "name CONTAINS 'SKIP' AND type CONTAINS 'Button'")
   private WebElement btnSkip;
 }

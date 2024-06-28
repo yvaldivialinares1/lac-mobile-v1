@@ -27,7 +27,7 @@ public class AllureLogger {
   private static final String LOG_HEADER = "LA Clippers | ";
   private static final String NO_CONTENT = "Nothing to report!";
   private static final String BASE_PATH = System.getProperty("user.dir") + "/allure-results/";
-  private static final String ENV =
+  public static final String ENV =
     Environments.byName(System.getProperty("environment")).getName();
 
   /**
@@ -149,11 +149,11 @@ public class AllureLogger {
     }
     allureEnvironmentWriter(ImmutableMap.<String, String>builder()
       .put("Environment", ENV)
-      .put("Test Execution ID", testExecutionId)
       .put("Device Name", deviceName)
       .put("Device S.O Version", platformVersion)
       .put("Device S.O Name", platformName)
       .put("App Version", APP_VERSION)
+      .put("Test Execution ID", testExecutionId)
       .build(), BASE_PATH);
   }
 

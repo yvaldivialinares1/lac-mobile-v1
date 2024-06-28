@@ -1,15 +1,11 @@
 package com.automation.lac.qa.fanapp.mobile.stepsdefinitions;
 
 import com.automation.lac.qa.fanapp.mobile.questions.EducationalQuestions;
-import com.automation.lac.qa.fanapp.mobile.tasks.identitypass.MyIdentityPassEducationalTask;
 import io.cucumber.java.en.And;
 
 public class EducationalStepsDefinition {
 
-  EducationalQuestions educationalQuestions = new EducationalQuestions();
-
-  protected MyIdentityPassEducationalTask myIdentityPassEducationalTask
-    = new MyIdentityPassEducationalTask();
+  private final EducationalQuestions educationalQuestions = new EducationalQuestions();
 
   /**
    * Valid string values:

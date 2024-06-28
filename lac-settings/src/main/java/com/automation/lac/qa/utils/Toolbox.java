@@ -2,7 +2,6 @@ package com.automation.lac.qa.utils;
 
 import java.security.SecureRandom;
 import lombok.experimental.UtilityClass;
-import net.datafaker.Faker;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -11,8 +10,6 @@ import org.joda.time.format.DateTimeFormatter;
 @UtilityClass
 public class Toolbox {
 
-  private static final Faker faker = new Faker();
-  private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
   private static final String LOWERCASE_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
   private static final String UPPERCASE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   private static final String SPECIAL_CHARACTERS = "!@#$*-_+,.";

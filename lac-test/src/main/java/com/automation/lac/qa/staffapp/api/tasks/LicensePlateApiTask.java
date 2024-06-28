@@ -1,37 +1,46 @@
 package com.automation.lac.qa.staffapp.api.tasks;
 
 import static com.automation.lac.qa.staffapp.api.models.cms.CountryCodesResponse.State;
-import static com.automation.lac.qa.staffapp.constants.ContextConstants.STATE;
-import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 
-import com.automation.lac.qa.faker.models.VehicleInfo;
+import com.automation.lac.qa.faker.models.userinfo.VehicleInfo;
 import com.automation.lac.qa.staffapp.api.models.identity.LicensePlateDeleteDto;
 import com.automation.lac.qa.staffapp.api.models.identity.LicensePlateDto;
 import com.automation.lac.qa.staffapp.api.services.identity.IntuitDomeAccountService;
 import com.automation.lac.qa.staffapp.api.services.identity.LicensePlateService;
+import com.automation.lac.qa.staffapp.api.services.identity.StaffMemberAccountService;
 import com.automation.lac.qa.staffapp.api.utils.TestDataUtils;
+import com.automation.lac.qa.staffapp.mobile.enums.MemberType;
 import java.security.SecureRandom;
 import java.util.List;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 @UtilityClass
+@Slf4j
 public class LicensePlateApiTask {
 
   private final SecureRandom random = new SecureRandom();
+  private final String unitedStates = "United States";
+  private static List<State> states;
 
   /**
    * Delete all linked license plates from account
    *
-   * @param accountId String indicating the id of fan account.
+   * @param accountId  String indicating the id of fan account.
+   * @param memberType MemberType indication the member type.
    */
-  public void deleteAllLicensePlates(String accountId) {
-    List<LicensePlateDto> licensePlates =
-      IntuitDomeAccountService.findIntuitDomeAccountById(accountId).getLicensePlates();
+  public static void deleteAllLicensePlates(String accountId, MemberType memberType) {
+    List<LicensePlateDto> licensePlates = memberType.equals(MemberType.STAFF)
+      ? StaffMemberAccountService.findStaffMemberAccountById(accountId).getLicensePlates()
+      : IntuitDomeAccountService.findIntuitDomeAccountById(accountId).getLicensePlates();
 
     if (!licensePlates.isEmpty()) {
-      licensePlates.forEach(licensePlate -> licensePlate.setId(accountId));
+      if (memberType.equals(MemberType.STAFF))
+        licensePlates.forEach(
+          licensePlate -> licensePlate.setMemberType(MemberType.STAFF.getValue()));
 
       licensePlates.forEach(licensePlate -> {
+        licensePlate.setId(accountId);
         LicensePlateDeleteDto dto = LicensePlateDeleteDto.builder()
           .id(licensePlate.getId())
           .licensePlate(licensePlate.getLicensePlate())
@@ -41,9 +50,14 @@ public class LicensePlateApiTask {
           .make(licensePlate.getMake())
           .model(licensePlate.getModel())
           .color(licensePlate.getColor())
+          .memberType(licensePlate.getMemberType())
           .build();
-
-        LicensePlateService.deleteLicensePlate(dto);
+        if (memberType.equals(MemberType.STAFF)) {
+          licensePlate.setMemberType(MemberType.STAFF.getValue());
+          LicensePlateService.deleteLicensePlateV2(dto);
+        } else {
+          LicensePlateService.deleteLicensePlate(dto);
+        }
       });
     }
   }
@@ -53,15 +67,18 @@ public class LicensePlateApiTask {
    *
    * @param accountId        String indicating the id of fan account.
    * @param numberOfVehicles int indication the expected amount of vehicles added to an account.
+   * @param memberType       MemberType indication the member type.
    */
-  public void registerLicensePlates(String accountId, int numberOfVehicles) {
-    List<State> states = CmsApiTask.getStateCodesAndStateNamesByCountryName("United States");
-    State state = states.get(random.nextInt(states.size() - 2));
-    getTestContext().set(STATE, state);
+  public static void registerLicensePlates(String accountId,
+                                           int numberOfVehicles, MemberType memberType) {
+    if (states == null || states.isEmpty()) {
+      states = CmsApiTask.getStateCodesAndStateNamesByCountryName(unitedStates);
+    }
 
     List<VehicleInfo> randomVehicles = TestDataUtils.createRandomVehicles(numberOfVehicles);
 
     randomVehicles.forEach(vehicleInfo -> {
+      final State state = states.get(random.nextInt(states.size() - 2));
       LicensePlateDto plateDto = LicensePlateDto.builder()
         .licensePlate(vehicleInfo.getLicensePlateNumber())
         .state(state.getCode())
@@ -70,6 +87,7 @@ public class LicensePlateApiTask {
         .make(vehicleInfo.getMake())
         .model(vehicleInfo.getModel())
         .color(vehicleInfo.getColor())
+        .memberType(memberType.getValue())
         .build();
 
       LicensePlateService.registerLicensePlate(plateDto);
@@ -81,12 +99,13 @@ public class LicensePlateApiTask {
    *
    * @return LicensePlateDto
    */
-  public LicensePlateDto generateUnknownLicencePlate() {
-    List<State> states = CmsApiTask.getStateCodesAndStateNamesByCountryName("United States");
+  public static LicensePlateDto generateUnknownLicencePlate() {
+    if (states == null || states.isEmpty()) {
+      states = CmsApiTask.getStateCodesAndStateNamesByCountryName("United States");
+    }
     State state = states.get(random.nextInt(states.size() - 2));
-    getTestContext().set(STATE, state);
-    VehicleInfo vehicleInfo =
-      TestDataUtils.createRandomVehicles(1).get(0);
+    log.info("Current licence plate state testing value is {}", state.getName());
+    VehicleInfo vehicleInfo = TestDataUtils.createRandomVehicles(1).get(0);
     return LicensePlateDto.builder()
       .licensePlate(vehicleInfo.getLicensePlateNumber())
       .state(state.getCode())
@@ -95,5 +114,16 @@ public class LicensePlateApiTask {
       .model(vehicleInfo.getModel())
       .color(vehicleInfo.getColor())
       .build();
+  }
+
+  /**
+   * Extract the state name related to specific state code.
+   *
+   * @param stateCode state code value.
+   * @return String state name value
+   */
+  public static String getStateName(String stateCode) {
+    return states.stream().filter(state -> state.getCode().equals(stateCode)).findFirst()
+      .orElseThrow().getName();
   }
 }

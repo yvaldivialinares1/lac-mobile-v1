@@ -27,11 +27,6 @@
             <name>Maven Central</name>
             <url>https://repo1.maven.org/maven2/</url>
         </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <name>Jit Pack</name>
-            <url>https://jitpack.io</url>
-        </repository>
     </repositories>
     <build>
         <plugins>

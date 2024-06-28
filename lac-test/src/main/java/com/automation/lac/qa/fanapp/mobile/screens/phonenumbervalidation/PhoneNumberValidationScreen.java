@@ -13,7 +13,7 @@ public class PhoneNumberValidationScreen extends MobileBaseScreen {
   @AndroidFindBy(xpath = "//*[@resource-id='bgContainer']")
   private WebElement lblOtpNotification;
 
-  @iOSXCUITFindBy(accessibility = "id_input_code")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == \"message\" AND label == \", \"")
   @AndroidFindBy(uiAutomator = "descriptionStartsWith(\"Code input\")")
   private WebElement txtPhoneVerificationCode;
 

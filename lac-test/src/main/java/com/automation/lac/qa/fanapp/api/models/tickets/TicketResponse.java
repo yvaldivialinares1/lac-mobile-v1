@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TicketResponse {
-
   private int maximumAllowed;
   private String availability;
   private boolean onSale;
@@ -23,4 +22,5 @@ public class TicketResponse {
   private int currentAvailability;
   private int currentAccessibleAvailability;
   private String hostEventId;
+  private CmsData cmsData;
 }

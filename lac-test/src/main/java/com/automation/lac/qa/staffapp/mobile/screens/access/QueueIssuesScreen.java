@@ -2,6 +2,8 @@ package com.automation.lac.qa.staffapp.mobile.screens.access;
 
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import com.automation.lac.qa.staffapp.mobile.screens.access.components.EventCardComponent;
+import com.automation.lac.qa.staffapp.mobile.screens.commons.components.BannerMessageComponent;
+import com.automation.lac.qa.staffapp.mobile.screens.commons.components.ProgressBarComponent;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import java.util.List;
 import lombok.Getter;
@@ -63,4 +65,7 @@ public class QueueIssuesScreen extends MobileBaseScreen {
 
   @iOSXCUITFindBy(accessibility = "issue_card_list")
   private List<EventCardComponent> eventCardList;
+
+  private ProgressBarComponent progressBarComponent;
+  private BannerMessageComponent bannerMessageComponent;
 }

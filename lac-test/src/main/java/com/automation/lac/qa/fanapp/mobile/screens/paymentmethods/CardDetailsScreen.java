@@ -1,10 +1,13 @@
 package com.automation.lac.qa.fanapp.mobile.screens.paymentmethods;
 
+import static com.automation.lac.qa.utils.mobile.DeviceActions.getElement;
+
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import java.util.List;
 import lombok.Getter;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 @Getter
@@ -38,7 +41,7 @@ public class CardDetailsScreen extends MobileBaseScreen {
 
   //Nickname modal..
 
-  @AndroidFindBy(uiAutomator = ".descriptionContains(\"Save\")")
+  @AndroidFindBy(id = "paymentMethodEditNickNameSave")
   @iOSXCUITFindBy(iOSNsPredicate = "name == \"edit_nickname_save_button\"")
   private WebElement btnSaveNicknameAtModal;
 
@@ -67,7 +70,7 @@ public class CardDetailsScreen extends MobileBaseScreen {
     + "AND label == \"CANCEL\"")
   private WebElement btnCancelInConfirmationModal;
 
-  @AndroidFindBy(uiAutomator = ".resourceId(\"tvPrimaryCta\")")
+  @AndroidFindBy(uiAutomator = ".resourceId(\"btndelete and update\")")
   @iOSXCUITFindBy(iOSNsPredicate = "name == \"delete_card_primary_button\"")
   private WebElement btnDeleteAndUpdateInConfirmationModal;
 
@@ -76,4 +79,21 @@ public class CardDetailsScreen extends MobileBaseScreen {
     + "AND name = 'payment_method_card_name_label'")
   private List<WebElement> lstPaymentMethodsInConfirmationModal;
 
+  @AndroidFindBy(id = "modalContentView")
+  @iOSXCUITFindBy(iOSClassChain = "**/XCUIElementTypeScrollView[2]")
+  private WebElement deleteModalView;
+
+  /**
+   * get card Details Card Number
+   */
+  public static WebElement getCardNumber(String lastFour) {
+    if (!isAndroid()) {
+      return getElement(
+        By.xpath(String.format("//XCUIElementTypeStaticText[@name='card_"
+          + "details_card_number'][contains(@label,'%s')]", lastFour)));
+    } else {
+      return getElement(
+        By.xpath(String.format("//*[@resource-id='tvBrandName'][contains(@text,'%s')]", lastFour)));
+    }
+  }
 }

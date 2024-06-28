@@ -1,6 +1,9 @@
 package com.automation.lac.qa.fanapp.mobile.questions;
 
 import static com.automation.lac.qa.assertions.SoftAssertManager.getSoftAssert;
+import static com.automation.lac.qa.fanapp.mobile.utils.DeviceActions.quickIsDisplayed;
+import static com.automation.lac.qa.pages.MobileBaseScreen.isAndroid;
+import static com.automation.lac.qa.utils.mobile.WaitActions.isTheElementVisible;
 
 import com.automation.lac.qa.fanapp.mobile.enums.ReminderNames;
 import com.automation.lac.qa.fanapp.mobile.screens.educationals.AddPaymentMethodEducationalScreen;
@@ -8,9 +11,11 @@ import com.automation.lac.qa.fanapp.mobile.screens.educationals.AgeVerificationE
 import com.automation.lac.qa.fanapp.mobile.screens.educationals.GameFaceIdEducationalScreen;
 import com.automation.lac.qa.fanapp.mobile.screens.educationals.MyIdentityPassEducationalScreen;
 import com.automation.lac.qa.fanapp.mobile.screens.educationals.TeammateAccountsEducationalScreen;
+import com.automation.lac.qa.fanapp.mobile.screens.sharepayments.SharePaymentsScreen;
 import com.automation.lac.qa.fanapp.mobile.tasks.ageverification.AgeVerificationEducationalTask;
 import com.automation.lac.qa.fanapp.mobile.tasks.gamefaceid.GameFaceIdEducationalTask;
 import com.automation.lac.qa.fanapp.mobile.tasks.identitypass.MyIdentityPassEducationalTask;
+import com.automation.lac.qa.utils.CustomException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,18 +36,21 @@ public class EducationalQuestions {
     new MyIdentityPassEducationalTask();
   private final AgeVerificationEducationalTask ageVerificationEducationalTask =
     new AgeVerificationEducationalTask();
+  private final SharePaymentsScreen sharePaymentsScreen =
+    new SharePaymentsScreen();
+
+  String txtAttribute = isAndroid() ? "text" : "label";
 
   /**
    * Verify elements displayed on add payment educational screen
    */
   public void checkAddPaymentsEducationalScreenElements() {
-    getSoftAssert().assertTrue(paymentsEduScreen.getImgAddPaymentMethodLogo().isDisplayed(),
-      "Checking add payment method logo is displayed");
-
-    getSoftAssert().assertTrue(paymentsEduScreen.getLblAddPaymentMethodTitle().isDisplayed(),
+    getSoftAssert().assertTrue(isTheElementVisible(
+        paymentsEduScreen.getLblAddPaymentMethodTitle(), 10),
       "Checking add payment method title is displayed");
 
-    getSoftAssert().assertTrue(paymentsEduScreen.getBtnAddPaymentMethod().isDisplayed(),
+    getSoftAssert().assertTrue(isTheElementVisible(
+        paymentsEduScreen.getBtnAddPaymentMethod(), 10),
       "Checking add payment method button is displayed");
   }
 
@@ -50,47 +58,38 @@ public class EducationalQuestions {
    * Verify elements displayed on add identity pass educational screen
    */
   public void checkIdentityPassEducationalScreenElements() {
-    getSoftAssert().assertTrue(identityPassEduScreen.getImgAddIdentityPassLogo().isDisplayed(),
-      "Checking add identity pass logo is displayed");
-
-    getSoftAssert().assertTrue(identityPassEduScreen.getLblAddIdentityPassTitle().isDisplayed(),
+    getSoftAssert().assertTrue(isTheElementVisible(
+        identityPassEduScreen.getLblAddIdentityPassTitle(), 10),
       "Checking add identity pass title is displayed");
 
-    getSoftAssert().assertTrue(identityPassEduScreen.getBtnAddIdentityPass().isDisplayed(),
+    getSoftAssert().assertTrue(isTheElementVisible(
+        identityPassEduScreen.getBtnAddIdentityPass(), 10),
       "Checking add identity pass button is displayed");
-
-    //TODO: Remove task when Identity Pass can be completed from reminder
-    myIdentityPassEducationalTask.clickOnBackButtonEducationalScreen();
   }
 
   /**
    * Verify elements displayed on game face id educational screen
    */
   public void checkGameFaceIdEducationalScreenElements() {
-    getSoftAssert().assertTrue(gameFaceEduScreen.getImgGameFaceIdLogo().isDisplayed(),
-      "Checking add game face id logo is displayed");
-
-    getSoftAssert().assertTrue(gameFaceEduScreen.getLblSetGameFaceIdTitle().isDisplayed(),
+    getSoftAssert().assertTrue(isTheElementVisible(
+        gameFaceEduScreen.getLblSetGameFaceIdTitle(), 10),
       "Checking add game face id title is displayed");
 
-    getSoftAssert().assertTrue(gameFaceEduScreen.getBtnSetGameFaceId().isDisplayed(),
+    getSoftAssert().assertTrue(isTheElementVisible(
+        gameFaceEduScreen.getBtnSetGameFaceId(), 10),
       "Checking add game face id button is displayed");
-
-    //TODO: Remove task when GameFace can be completed from reminder
-    gameFaceIdEducationalTask.clickBackOnGameFaceEducationalScreen();
   }
 
   /**
    * Verify elements displayed on age verification educational screen
    */
   public void checkAgeVerificationEducationalScreenElements() {
-    getSoftAssert().assertTrue(ageVerificationEduScreen.getImgAgeVerificationLogo().isDisplayed(),
-      "Checking age verification logo is displayed");
-
-    getSoftAssert().assertTrue(ageVerificationEduScreen.getLblVerifyYourAgeTitle().isDisplayed(),
+    getSoftAssert().assertTrue(isTheElementVisible(
+        ageVerificationEduScreen.getLblVerifyYourAgeTitle(), 10),
       "Checking age verification title is displayed");
 
-    getSoftAssert().assertTrue(ageVerificationEduScreen.getBtnVerifyMyAge().isDisplayed(),
+    getSoftAssert().assertTrue(isTheElementVisible(
+        ageVerificationEduScreen.getBtnVerifyMyAge(), 10),
       "Checking verify my age button is displayed");
 
     //TODO: Remove task when Age Verification can be completed from reminder
@@ -101,18 +100,66 @@ public class EducationalQuestions {
    * Verify elements displayed on add mini accounts educational screen
    */
   public void checkAddMiniAccountsEducationalScreenElements() {
-    getSoftAssert().assertTrue(miniAccountsEduScreen.getImgTeammateAccountsLogo().isDisplayed(),
+    //TODO Remove conditional when bug is fixed
+    if (!isTheElementVisible(miniAccountsEduScreen.getBtnAddTeammate(), 5))
+      throw new CustomException("App crashes when the fan tries to enter to the teammate option."
+        + "\nAndroid bug: CA-54852");
+
+    getSoftAssert().assertTrue(isTheElementVisible(
+        miniAccountsEduScreen.getImgTeammateAccountsLogo(), 10),
       "Checking mini accounts logo is displayed");
 
-    getSoftAssert().assertTrue(miniAccountsEduScreen.getLblTeammateAccountsTitle().isDisplayed(),
+    getSoftAssert().assertTrue(isTheElementVisible(
+        miniAccountsEduScreen.getLblTeammateAccountsTitle(), 10),
       "Checking mini accounts title is displayed");
 
-    getSoftAssert().assertTrue(miniAccountsEduScreen.getBtnAddTeammate().isDisplayed(),
+    getSoftAssert().assertTrue(isTheElementVisible(
+        miniAccountsEduScreen.getBtnAddTeammate(), 10),
       "Checking add mini accounts button is displayed");
   }
 
   /**
+   * Verify elements displayed on the share mini accounts educational screen.
+   */
+  public void checkShareMiniAccountsEducationalScreenElements() {
+    getSoftAssert().assertEquals(
+      sharePaymentsScreen.getLblShareCardsHeaderTitle().getAttribute(txtAttribute),
+      "Share with Teammate Account",
+      "Share card Header Title is correctly displayed");
+    getSoftAssert().assertTrue(isTheElementVisible(
+        sharePaymentsScreen.getImgShareWithAccountsLogo(), 10),
+      "Checking share card with mini accounts logo is displayed");
+    getSoftAssert().assertTrue(
+      quickIsDisplayed(sharePaymentsScreen.getLblShareCardsAccountsTitle()),
+      "Share card Title is Displayed");
+    getSoftAssert().assertTrue(isTheElementVisible(
+        sharePaymentsScreen.getBtnSharePaymentMethod(), 10),
+      "Checking share payment method with mini accounts button is displayed");
+  }
+
+
+  /**
+   * Verify elements displayed on the share fan accounts educational screen.
+   */
+  public void checkShareFanAccountsEducationalScreenElements() {
+    getSoftAssert().assertEquals(
+      sharePaymentsScreen.getLblShareCardsHeaderTitle().getText(),
+      "Share with a Fan",
+      "Share card Header Title is correctly displayed");
+    getSoftAssert().assertTrue(isTheElementVisible(
+        sharePaymentsScreen.getImgShareWithAccountsLogo(), 10),
+      "Checking share card with fan accounts logo is displayed");
+    getSoftAssert().assertTrue(
+      quickIsDisplayed(sharePaymentsScreen.getLblShareCardsAccountsTitle()),
+      "Share card Title is Displayed");
+    getSoftAssert().assertTrue(isTheElementVisible(
+        sharePaymentsScreen.getBtnSharePaymentMethod(), 10),
+      "Checking share payment method with fan accounts button is displayed");
+  }
+
+  /**
    * Method that validates one educational screen
+   *
    * @param reminderName String to identify reminder related to educational screen
    */
   public void validateEducationalScreen(String reminderName) {
@@ -123,7 +170,18 @@ public class EducationalQuestions {
       case AGE_VERIFICATION -> checkAgeVerificationEducationalScreenElements();
       case IDENTITY_PASS -> checkIdentityPassEducationalScreenElements();
       case MINI_ACCOUNTS -> checkAddMiniAccountsEducationalScreenElements();
+      case SHARE_MINI_ACCOUNT -> checkShareMiniAccountsEducationalScreenElements();
+      case SHARE_FAN_ACCOUNT -> checkShareFanAccountsEducationalScreenElements();
       default -> log.warn("Invalid Expected Educational Screen");
     }
+  }
+
+  /**
+   * Validates if the GameFaceEducationalScreen is Visible
+   *
+   * @return boolean object
+   */
+  public boolean isGameFaceEducationalScreenVisible() {
+    return isTheElementVisible(gameFaceEduScreen.getBtnSetGameFaceId(), 30);
   }
 }

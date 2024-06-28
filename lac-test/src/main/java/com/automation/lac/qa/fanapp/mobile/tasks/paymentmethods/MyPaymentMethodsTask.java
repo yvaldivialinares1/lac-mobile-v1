@@ -3,25 +3,23 @@ package com.automation.lac.qa.fanapp.mobile.tasks.paymentmethods;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.ADD_CARD;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.ADD_PAYMENT_METHOD;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.BACK;
-import static com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections.DOWN_TO_UP;
-import static com.automation.lac.qa.fanapp.mobile.utils.DeviceActions.waitForElementVisibility;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
-import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementToBeClickable;
+import static com.automation.lac.qa.utils.mobile.SwipeActions.swipeUntilFindElement;
+import static com.automation.lac.qa.utils.mobile.SwipeDirections.DOWN_TO_UP;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementAttributeValue;
 
 import com.automation.lac.qa.fanapp.api.models.PaymentMethodFile;
-import com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections;
 import com.automation.lac.qa.fanapp.mobile.screens.commons.CommonsScreen;
 import com.automation.lac.qa.fanapp.mobile.screens.paymentmethods.MyPaymentMethodsScreen;
 import com.automation.lac.qa.fanapp.mobile.tasks.myprofile.MyPaymentsTask;
-import com.automation.lac.qa.fanapp.mobile.utils.DeviceActions;
 import com.automation.lac.qa.fanapp.mobile.utils.PaymentUtils;
+import com.automation.lac.qa.utils.mobile.WaitActions;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 
 @Slf4j
 public class MyPaymentMethodsTask extends MyPaymentMethodsScreen {
 
-  private final String txtAttribute = isAndroid() ? "text" : "label";
   private final CommonsScreen commonsScreen = new CommonsScreen();
   private final AddPaymentMethodTask addPaymentMethod = new AddPaymentMethodTask();
   private final CardDetailsTask cardDetails = new CardDetailsTask();
@@ -34,9 +32,8 @@ public class MyPaymentMethodsTask extends MyPaymentMethodsScreen {
    */
   public void navigateToCardDetail(PaymentMethodFile.PaymentMethod card) {
     String lastFour = PaymentUtils.getCardLastFourDigits(card.getCardNumber());
-    click(DeviceActions.scrollIntoListToElementWithCondition(getCardsList(), DOWN_TO_UP, 30,
-        webElement -> webElement.getAttribute(txtAttribute).contains(lastFour)),
-      String.format("card item %s", lastFour));
+    swipeUntilFindElement(getCardNumber(lastFour), DOWN_TO_UP, getScrollableView());
+    click(getCardNumber(lastFour), lastFour);
   }
 
   /**
@@ -44,11 +41,10 @@ public class MyPaymentMethodsTask extends MyPaymentMethodsScreen {
    * button, else it will interact with the add payment method button.
    */
   public void addPaymentMethod() {
-    if (waitForElementVisibility(getLblNoPaymentMethodsYet(), 5)) {
+    if (WaitActions.isTheElementVisible(getLblNoPaymentMethodsYet(), 5)) {
       click(getBtnAddPaymentMethod(), ADD_PAYMENT_METHOD.getValue());
-    } else if (waitForElementVisibility(getLblPaymentMethods(), 5)) {
-      DeviceActions.verticallyScrollToElement(getBtnAddCard(),
-        SwipeDirections.DOWN_TO_UP,1, 25);
+    } else if (WaitActions.isTheElementVisible(getLblPaymentMethods(), 5)) {
+      swipeUntilFindElement(getBtnAddCard(), DOWN_TO_UP, getScrollableView());
       click(getBtnAddCard(), ADD_CARD.getValue());
     } else {
       log.warn("Add card or add payment method buttons are not displayed.");
@@ -57,7 +53,8 @@ public class MyPaymentMethodsTask extends MyPaymentMethodsScreen {
 
 
   public void goToMyPaymentsFromMyPaymentMethods() {
-    click(waitForElementToBeClickable(5, commonsScreen.getBtnBack()), BACK.getValue());
+    waitForElementAttributeValue(commonsScreen.getBtnBack(), "clickable", "true", 10);
+    click(commonsScreen.getBtnBack(), BACK.getValue());
   }
 
   /**

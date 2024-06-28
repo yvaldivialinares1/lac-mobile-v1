@@ -4,7 +4,7 @@ package com.automation.lac.qa.driver;
 import static com.automation.lac.qa.browserstack.SessionService.getHubUrl;
 import static com.automation.lac.qa.driver.AppiumConstants.ANDROID_PLATFORM;
 import static com.automation.lac.qa.driver.AppiumConstants.IOS_PLATFORM;
-import static com.automation.lac.qa.driver.AppiumConstants.NEW_COMMAND_TIMEOUT;
+import static com.automation.lac.qa.driver.AppiumConstants.WAIT_TIMEOUT;
 import static com.automation.lac.qa.driver.AppiumConstants.platformName;
 
 import com.automation.lac.qa.utils.CustomException;
@@ -39,7 +39,7 @@ public class Device {
       default -> throw new CustomException(
         "PlatformName '" + platformName + "' is not a valid option.");
     };
-    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(NEW_COMMAND_TIMEOUT));
+    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(WAIT_TIMEOUT));
     return driver;
   }
 

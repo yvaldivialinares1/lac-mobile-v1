@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="local" parallel="tests" thread-count="6">
+    <test verbose="1" name="FanAppRunnerTest">
+        <classes>
+            <class name="runner.FanAppRunnerTest"></class>
+        </classes>
+    </test>
+    <test verbose="1" name="StaffAppRunnerTest">
+        <classes>
+            <class name="runner.StaffAppRunnerTest"></class>
+        </classes>
+    </test>
+    <test verbose="1" name="UserCreationRunnerTest">
+        <classes>
+            <class name="runner.UserCreationRunnerTest"></class>
+        </classes>
+    </test>
+</suite>

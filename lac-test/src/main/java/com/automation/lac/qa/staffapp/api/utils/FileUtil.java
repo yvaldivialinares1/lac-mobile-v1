@@ -14,7 +14,7 @@ public class FileUtil {
   /**
    * Read the file and convert it to based64 decoded string value.
    */
-  public String getBase64DecodedString(String pathToFile) {
+  public static String getBase64DecodedString(String pathToFile) {
     File file = new File(pathToFile);
     if (!file.exists()) {
       throw new IllegalArgumentException("File not found: " + pathToFile);

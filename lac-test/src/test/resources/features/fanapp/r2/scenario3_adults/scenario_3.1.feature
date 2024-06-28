@@ -1,10 +1,10 @@
-@missions @missions_r2 @smoke_r2 @scenario_3_r2
+@missions @missions_r2 @smoke_r2 @scenario_3_r2 @r2_all
 Feature: Missions R2 - Scenario 3.1
 
   @adult_user
   Scenario: Registration of a new adult user skipping only the payment method process
-    Given An adult who has personal information generated
-    And The user doesn’t have a Clipper account
+    Given the user is an adult who has personal information generated
+    And the user doesn't have a Clippers account
     When the user is on the Welcome Home screen
     And the user starts the account registration process
     And the user completes the account registration data with his email address
@@ -12,8 +12,7 @@ Feature: Missions R2 - Scenario 3.1
     # And the user complete the game face registration (BLOCKED: Pending mockup)
     # And the user is NOT automatically verified on Gamer Face, age verification is required (BLOCKED: Pending mockup)
     And the user skip the game face registration
-    #And the user complete the identity pass registration (BLOCKED: Pending mockup)
-    And the user skip the identity pass registration
+    And the user completes the identity pass registration
     And the user skip the payment method registration
     And the user completes the registration process and is on the home screen
     And the user navigates to my profile

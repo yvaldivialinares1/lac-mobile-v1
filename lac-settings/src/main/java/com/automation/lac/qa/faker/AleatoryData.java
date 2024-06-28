@@ -1,28 +1,33 @@
 package com.automation.lac.qa.faker;
 
+import static com.automation.lac.qa.faker.enums.FanType.ADULT;
+import static com.automation.lac.qa.faker.enums.FanType.MINI;
+import static com.automation.lac.qa.faker.enums.FanType.YOUNG_ADULT;
 import static com.automation.lac.qa.onlinesim.OnlineSimApi.getAvailableNumbersByCountry;
 import static com.automation.lac.qa.onlinesim.OnlineSimApi.sanitizeNumber;
 import static com.automation.lac.qa.onlinesim.models.OnlineSimResponse.NumberInfo;
+import static com.automation.lac.qa.utils.UserCreationConstant.TEAMMATE;
+import static com.automation.lac.qa.utils.UserCreationConstant.VEHICLE;
 import static java.lang.Boolean.FALSE;
 
 import com.automation.lac.qa.faker.enums.FanType;
 import com.automation.lac.qa.faker.enums.VehicleModel;
-import com.automation.lac.qa.faker.models.MiniAccountInfo;
-import com.automation.lac.qa.faker.models.PaymentMethod;
 import com.automation.lac.qa.faker.models.UserInfo;
-import com.automation.lac.qa.faker.models.VehicleInfo;
 import com.automation.lac.qa.faker.models.userinfo.AccountInfo;
 import com.automation.lac.qa.faker.models.userinfo.AddressInfo;
+import com.automation.lac.qa.faker.models.userinfo.PaymentMethod;
 import com.automation.lac.qa.faker.models.userinfo.PersonalInfo;
 import com.automation.lac.qa.faker.models.userinfo.PhoneInfo;
+import com.automation.lac.qa.faker.models.userinfo.TeammateInfo;
+import com.automation.lac.qa.faker.models.userinfo.VehicleInfo;
 import com.automation.lac.qa.onlinesim.enums.OnlineSimAvailableCountry;
 import com.automation.lac.qa.utils.Toolbox;
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import lombok.experimental.UtilityClass;
 import net.datafaker.Faker;
 
@@ -33,7 +38,23 @@ public class AleatoryData {
   private static final VehicleModel[] MAKES = VehicleModel.values();
   private static String firstName;
   private static String lastname;
-  private final Random random = new Random();
+  private final SecureRandom random = new SecureRandom();
+
+  /**
+   * Creates a random PersonalInfo list of objects.
+   *
+   * @param usersNumber The numbers of users to create information.
+   * @return A PersonalInfo list of objects populated with random data.
+   */
+  public static List<UserInfo> createRandomInfoList(int usersNumber, FanType fanType) {
+    List<UserInfo> usersInfoList = new ArrayList<>();
+
+    for (int i = 0; i < usersNumber; i++) {
+      usersInfoList.add(createRandomInfo(fanType));
+    }
+
+    return usersInfoList;
+  }
 
   /**
    * Creates a random PersonalInfo object.
@@ -51,6 +72,12 @@ public class AleatoryData {
       .accountInfo(buildAccountInfo())
       .phoneInfo(buildPhoneInfo(numberInfo))
       .billingAddress(buildAddressInfo());
+
+    if (!TEAMMATE.isEmpty() && type.equals(ADULT) || type.equals(YOUNG_ADULT))
+      builder.teammatesInfo(createRandomTeammates(TEAMMATE));
+
+    if (VEHICLE > 0 && type != MINI)
+      builder.vehiclesInfo(createRandomVehicles(VEHICLE));
 
     return builder.build();
   }
@@ -87,23 +114,36 @@ public class AleatoryData {
   }
 
   /**
-   * Generates a random MiniAccountInfo object.
+   * Generates a random TeammateInfo object.
    *
-   * @return A list of MiniAccountInfo object populated with random data.
+   * @return A list of TeammateInfo object populated with random data.
    */
-  public static List<MiniAccountInfo> createRandomMiniAccounts(int numberOfMiniAccount) {
-
-    List<MiniAccountInfo> miniAccounts = new ArrayList<>();
+  public static List<TeammateInfo> createRandomTeammates(int numberOfMiniAccount) {
+    List<Integer> teammateAges = new ArrayList<>();
 
     for (int i = 0; i < numberOfMiniAccount; i++) {
+      teammateAges.add(FAKER.random().nextInt(FanType.MINI.getMinAge(), FanType.MINI.getMaxAge()));
+    }
+
+    return createRandomTeammates(teammateAges);
+  }
+
+  /**
+   * Generates a random TeammateInfo object.
+   *
+   * @return A list of TeammateInfo object populated with random data.
+   */
+  public static List<TeammateInfo> createRandomTeammates(List<Integer> teammateAges) {
+
+    List<TeammateInfo> miniAccounts = new ArrayList<>();
+
+    for (int teammateAge : teammateAges) {
       String firstName = FAKER.name().firstName();
       String lastname = FAKER.name().lastName();
-      LocalDate birthDate =
-        FAKER.date().birthday(FanType.MINI.getMinAge(), FanType.MINI.getMaxAge())
-          .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+      LocalDate birthDate = getBirthDayDate(teammateAge);
       String chosenName = FAKER.basketball().players();
 
-      MiniAccountInfo miniAccount = MiniAccountInfo.builder()
+      TeammateInfo miniAccount = TeammateInfo.builder()
         .firstName(firstName)
         .lastName(lastname)
         .birthDate(birthDate)
@@ -139,6 +179,7 @@ public class AleatoryData {
 
   /**
    * Get a list of countries that have worked to use Phone OTP
+   *
    * @return List of countries
    */
   public static List<String> getAvailableCountries() {
@@ -179,7 +220,7 @@ public class AleatoryData {
 
   private static AccountInfo buildAccountInfo() {
     String email = Toolbox.generateValidEmail();
-    String password = Toolbox.generatePassword(10, 20, true, true, true, true);
+    String password = "Test@Clippers2024";
 
     return AccountInfo.builder()
       .email(email)
@@ -190,13 +231,14 @@ public class AleatoryData {
   }
 
   private static PhoneInfo buildPhoneInfo(NumberInfo number) {
-    String senderCode =
-      OnlineSimAvailableCountry.valueOf(number.getCountryName().toUpperCase()).getSenderCode();
-
     return PhoneInfo.builder()
       .phoneOtpCountry(number.getCountryName())
       .phoneOtpCountryCode(String.valueOf(number.getCountry()))
-      .phoneOtpSenderCode(senderCode)
       .build();
+  }
+
+  private static LocalDate getBirthDayDate(Integer age) {
+    return FAKER.date().birthday(age, age)
+      .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
   }
 }

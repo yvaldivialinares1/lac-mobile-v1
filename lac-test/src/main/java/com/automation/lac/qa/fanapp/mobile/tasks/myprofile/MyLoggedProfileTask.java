@@ -4,29 +4,46 @@ import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.ADD_I
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.ADD_YOUR_CARDS_ACCOUNT;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.BACK;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.GAME_FACE_ID_REMINDER;
+import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.LOG_OUT;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.MY_ACCOUNT_SETTINGS;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.MY_PAYMENTS;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.MY_VEHICLES;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.VERIFY_AGE_REMINDER;
 import static com.automation.lac.qa.fanapp.mobile.enums.FanAppKeys.REMINDER_CARD_VISIBILITY;
-import static com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections.HORIZONTAL;
 import static com.automation.lac.qa.fanapp.mobile.utils.DeviceActions.performSwipeOverAnElement;
 import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
-import static com.automation.lac.qa.utils.mobile.WaitActions.waitForReminderCardToAppear;
+import static com.automation.lac.qa.utils.mobile.SwipeActions.isTheSameDom;
+import static com.automation.lac.qa.utils.mobile.SwipeActions.swipeElementToTheBorder;
+import static com.automation.lac.qa.utils.mobile.SwipeActions.swipeUntilFindElement;
+import static com.automation.lac.qa.utils.mobile.SwipeDirections.DOWN_TO_UP;
+import static com.automation.lac.qa.utils.mobile.SwipeDirections.HORIZONTAL;
+import static com.automation.lac.qa.utils.mobile.SwipeDirections.LEFT_TO_RIGHT;
+import static com.automation.lac.qa.utils.mobile.SwipeDirections.RIGHT_TO_LEFT;
+import static com.automation.lac.qa.utils.mobile.WaitActions.isTheElementVisible;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementVisibility;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitForProcessToFinish;
 
 import com.automation.lac.qa.fanapp.mobile.enums.ReminderNames;
-import com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections;
 import com.automation.lac.qa.fanapp.mobile.screens.myprofile.MyLoggedProfileScreen;
-import com.automation.lac.qa.fanapp.mobile.utils.DeviceActions;
+import com.automation.lac.qa.fanapp.mobile.tasks.modals.ModalLogOutTasks;
+import com.automation.lac.qa.utils.CustomException;
 import com.automation.lac.qa.utils.mobile.WaitActions;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.openqa.selenium.By;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MyLoggedProfileTask extends MyLoggedProfileScreen {
+
+  private final ModalLogOutTasks modalLogOutTasks = new ModalLogOutTasks();
+
+  private static final Logger log = LoggerFactory.getLogger(MyLoggedProfileTask.class);
 
   public void clickOnGameFaceIdReminderLink() {
     click(getLnkGameFaceIdReminder(), GAME_FACE_ID_REMINDER.getValue());
@@ -37,6 +54,7 @@ public class MyLoggedProfileTask extends MyLoggedProfileScreen {
   }
 
   public void clickOnAddYourCardsReminderLink() {
+    waitForElementVisibility(getLnkAddYourCards(), 5);
     click(getLnkAddYourCards(), ADD_YOUR_CARDS_ACCOUNT.getValue());
   }
 
@@ -48,22 +66,7 @@ public class MyLoggedProfileTask extends MyLoggedProfileScreen {
     click(getBtnBack(), BACK.getValue());
   }
 
-  private void goToReminderCardAndroid(ReminderNames reminderName) {
-    boolean[] isFound = {false};
-    // iterate to the right
-    isFound[0] = findReminderCardAndroid(reminderName, 80, 10);
-    // iterate to the left
-    if (!isFound[0]) {
-      isFound[0] = findReminderCardAndroid(reminderName, 20, 90);
-    }
-
-    // save the visibility status
-    Map<ReminderNames, Boolean> reminderCardsVisibility = new HashMap<>();
-    reminderCardsVisibility.put(reminderName, isFound[0]);
-    getTestContext().set(REMINDER_CARD_VISIBILITY.name(), reminderCardsVisibility);
-  }
-
-  private void geToReminderCardIos(ReminderNames reminderName) {
+  private void goToReminderCardIos(ReminderNames reminderName) {
     boolean[] isFound = {false};
 
     isFound[0] = findReminderCardIOs(reminderName);
@@ -80,10 +83,64 @@ public class MyLoggedProfileTask extends MyLoggedProfileScreen {
    */
   public void goToReminderCard(String reminderName) {
     if (isAndroid()) {
-      goToReminderCardAndroid(ReminderNames.getReminderCardEnum(reminderName));
+      selectTheReminderCardInAndroid(reminderName);
     } else {
-      geToReminderCardIos(ReminderNames.getReminderCardEnum(reminderName));
+      goToReminderCardIos(ReminderNames.getReminderCardEnum(reminderName));
     }
+  }
+
+  /**
+   * @return list
+   */
+  public List<String> lookTheReminderCard() {
+    List<String> remindersVisible = new ArrayList<>();
+    if (isAndroid()) {
+      remindersVisible = searchReminderCardsOnAndroid();
+    } else {
+      //get reminder titles
+      List<String> reminderTitleNames = ReminderNames.getTitlesReminderNames();
+      //get reminders iOS
+      List<WebElement> lstReminderCards = getLstReminderCards();
+      for (WebElement card : lstReminderCards) {
+        for (String reminderTitle : reminderTitleNames) {
+          if (card.getAttribute("name").contains(reminderTitle)) {
+            remindersVisible.add(reminderTitle);
+          }
+        }
+      }
+    }
+    return remindersVisible;
+  }
+
+  private List<String> searchReminderCardsOnAndroid() {
+    int loops = 0;
+    List<String> remindersVisible = new ArrayList<>();
+    String previousPageSource;
+    do {
+      loops++;
+      log.info("reminder card name {}", getReminderCardsText().getText());
+      remindersVisible.add(getReminderCardsText().getText());
+      previousPageSource = getDriver().getPageSource();
+      swipeElementToTheBorder(RIGHT_TO_LEFT, getReminderCardsView());
+      waitForProcessToFinish(1);
+    } while (!isTheSameDom(previousPageSource));
+    for (int i = 0; i < loops; i++) {
+      swipeElementToTheBorder(LEFT_TO_RIGHT, getReminderCardsView());
+    }
+    return remindersVisible.stream().distinct().collect(Collectors.toList());
+  }
+
+  private void selectTheReminderCardInAndroid(String reminderCard) {
+    waitForElementVisibility(getReminderCardPosition(), 5);
+    String[] position = getReminderCardPosition().getAttribute("content-desc").split(" ");
+    ReminderNames reminderEnum = ReminderNames.getReminderCardEnum(reminderCard);
+    String finalXpath = String.format(xpathCard, reminderEnum.getTitle());
+    if (position[2].equals(position[4])) {
+      swipeUntilFindElement(finalXpath, LEFT_TO_RIGHT, getReminderCardsView());
+    } else {
+      swipeUntilFindElement(finalXpath, RIGHT_TO_LEFT, getReminderCardsView());
+    }
+    WaitActions.waitForProcessToFinish(1);
   }
 
   /**
@@ -94,14 +151,12 @@ public class MyLoggedProfileTask extends MyLoggedProfileScreen {
   public void clickOnReminder(String reminderName) {
     ReminderNames reminderEnum = ReminderNames.getReminderCardEnum(reminderName);
     if (isAndroid()) {
-      switch (reminderEnum) {
+      switch (Objects.requireNonNull(reminderEnum)) {
         case GAME_FACE_ID -> clickOnGameFaceIdReminderLink();
         case AGE_VERIFICATION -> clickOnVerifyAgeReminderLink();
         case ADD_CARDS -> clickOnAddYourCardsReminderLink();
         case IDENTITY_PASS -> clickOnAddIdentityPassReminderLink();
-        default -> {
-          // do nothing
-        }
+        default -> throw new CustomException("The option " + reminderEnum + " is not valid.");
       }
     } else {
       click(getLstReminderCards().stream().filter(card ->
@@ -109,15 +164,6 @@ public class MyLoggedProfileTask extends MyLoggedProfileScreen {
             .contains(reminderEnum.getTitle().toLowerCase())).findFirst().orElseThrow(),
         reminderName + " reminder card");
     }
-  }
-
-  /**
-   * This method go to my account settings from MyProfile
-   */
-  public void goToMyAccountSettingsFromMyProfile() {
-    DeviceActions.verticallyScrollToElement(getBtnMyAccountSettings(),
-      SwipeDirections.DOWN_TO_UP, 5, 30);
-    click(getBtnMyAccountSettings(), MY_ACCOUNT_SETTINGS.getValue());
   }
 
   private WebElement getTheVisibleReminderCardIOs() {
@@ -130,45 +176,6 @@ public class MyLoggedProfileTask extends MyLoggedProfileScreen {
       }
     }
     return focusedCard;
-  }
-
-  private boolean findReminderCardAndroid(ReminderNames reminderName, int startX, int endX) {
-    boolean[] isFound = {false};
-    boolean[] shouldStop = {false};
-    // define the amount of cards on screen
-    WebElement firstReminderCard = getLblCardNumber();
-    String cardNumberDescription = firstReminderCard.getAttribute("content-desc");
-    int numberOfCards = Integer.parseInt(cardNumberDescription.substring(
-      cardNumberDescription.length() - 1));
-    // define device width size
-    int deviceWidthSize = getDriver().manage().window().getSize().getWidth();
-    // define the card in the middle
-    int count = 0;
-    if (getLstReminderCards().size() >= 2
-      && getLstReminderCards().get(0).getSize().getWidth() < deviceWidthSize / 2) {
-      count = 1;
-    }
-    for (int i = 1; i <= numberOfCards; i++) {
-      WebElement reminderCard = getLstReminderCards().get(count);
-      if (WaitActions.waitForElementVisibility(
-        By.xpath(String.format(getXpathCard(), reminderName.getTitle())), 1)) {
-        isFound[0] = true;
-        break;
-      } else {
-        if (!shouldStop[0]) {
-          performSwipeOverAnElement(
-            reminderCard, HORIZONTAL, startX, endX, "reminder card");
-          waitForReminderCardToAppear(1);
-        }
-        if (reminderCard.getSize().getWidth() > deviceWidthSize / 2) {
-          shouldStop[0] = true;
-        }
-      }
-      if (numberOfCards > 1) {
-        count = 1;
-      }
-    }
-    return isFound[0];
   }
 
   private boolean findReminderCardIOs(ReminderNames reminderName) {
@@ -194,27 +201,63 @@ public class MyLoggedProfileTask extends MyLoggedProfileScreen {
       for (int i = 0; i < Math.abs(cardToBeFoundPosition - focusedCardPosition); i++) {
         performSwipeOverAnElement(
           focusedCard, HORIZONTAL, 20, 80, "reminder card to left");
-        waitForReminderCardToAppear(1);
+        waitForProcessToFinish(1);
       }
     } else {
       if (isFound[0]) {
         for (int i = 0; i < Math.abs(cardToBeFoundPosition - focusedCardPosition); i++) {
           performSwipeOverAnElement(
             focusedCard, HORIZONTAL, 80, 20, "reminder card to right");
-          waitForReminderCardToAppear(1);
+          waitForProcessToFinish(1);
         }
       }
     }
     return isFound[0];
   }
 
-  public void goToMyVehiclesFromMyProfile() {
-    DeviceActions.verticallyScrollToElement(getBtnMyVehicles(), SwipeDirections.DOWN_TO_UP, 1, 50);
+  /**
+   * This method go to my account settings from MyProfile
+   */
+  public void goToMyAccountSettings() {
+    if (isTheElementVisible(getPnlYourNextEvent(), 3)) {
+      swipeUntilFindElement(getBtnMyAccountSettings(), DOWN_TO_UP);
+      waitForProcessToFinish(1);
+    }
+    click(getBtnMyAccountSettings(), MY_ACCOUNT_SETTINGS.getValue());
+  }
+
+  /**
+   * go to my vehicles
+   */
+  public void goToMyVehicles() {
+    if (isTheElementVisible(getPnlYourNextEvent(), 3)) {
+      swipeUntilFindElement(getBtnMyVehicles(), DOWN_TO_UP);
+      waitForProcessToFinish(1);
+    }
     click(getBtnMyVehicles(), MY_VEHICLES.getValue());
   }
 
-  public void goToMyPaymentsFromMyProfile() {
-    DeviceActions.verticallyScrollToElement(getBtnMyPayments(), SwipeDirections.DOWN_TO_UP,1,  30);
+  /**
+   * This method go to payment screen
+   */
+  public void goToMyPayments() {
+    if (isTheElementVisible(getPnlYourNextEvent(), 3)) {
+      swipeUntilFindElement(getBtnMyPayments(), DOWN_TO_UP);
+      waitForProcessToFinish(1);
+    }
     click(getBtnMyPayments(), MY_PAYMENTS.getValue());
+  }
+
+  /**
+   * Initiates the user logout sequence.
+   * Swipes to log out button on My Profile, initiates log out, and confirms via modal dialog.
+   */
+  public void logoutFromTheApp() {
+    if (isTheElementVisible(getPnlYourNextEvent(), 3)) {
+      swipeUntilFindElement(getBtnLogOut(), DOWN_TO_UP);
+      waitForProcessToFinish(1);
+    }
+    click(getBtnLogOut(), LOG_OUT.getValue());
+    modalLogOutTasks.clickOnLogOutButton();
   }
 }

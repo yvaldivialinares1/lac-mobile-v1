@@ -1,5 +1,6 @@
 package com.automation.lac.qa.fanapp.mobile.screens.myvehicles;
 
+import com.automation.lac.qa.fanapp.mobile.screens.commons.components.SelectStateWidget;
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
@@ -15,7 +16,7 @@ public class RegisteredVehiclesScreen extends MobileBaseScreen {
   private List<WebElement> lstMyVehicles;
 
   @AndroidFindBy(accessibility = "Add vehicle")
-  @iOSXCUITFindBy(iOSNsPredicate = "name == 'ADD VEHICLE' AND type == 'XCUIElementTypeButton'")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_btn_add_vehicle_ds_button'")
   private WebElement btnAddVehicle;
 
   @AndroidFindBy(accessibility = "Back")
@@ -30,7 +31,15 @@ public class RegisteredVehiclesScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(iOSNsPredicate = "label == 'Your vehicle was deleted successfully.'")
   private WebElement lblVehicleDeletedSuccessMessage;
 
-  @AndroidFindBy(accessibility = "Close")
-  @iOSXCUITFindBy(iOSNsPredicate = "label == 'Close'")
+  @AndroidFindBy(id = "ivClose")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'banner_message_close'")
   private WebElement btnCloseSuccessMessage;
+
+  @AndroidFindBy(xpath = "//android.widget.TextView[@text='Add Vehicle']/..")
+  @iOSXCUITFindBy(xpath = "//XCUIElementTypeStaticText[@name='modal_message_title']/..")
+  private AddVehicleWidget addVehicleWidget;
+
+  @AndroidFindBy(xpath = "//android.view.View[@content-desc='Search']/../../..")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'Clippers + ID-STG'")
+  private SelectStateWidget selectStateWidget;
 }

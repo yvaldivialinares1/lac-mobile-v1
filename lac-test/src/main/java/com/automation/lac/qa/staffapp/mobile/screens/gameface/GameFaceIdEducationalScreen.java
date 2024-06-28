@@ -16,4 +16,10 @@ public class GameFaceIdEducationalScreen extends MobileBaseScreen {
 
   @iOSXCUITFindBy(accessibility = "continue_game_face_id_button")
   private WebElement btnContinueWithGameFaceId;
+
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'DO IT LATER'")
+  private WebElement btnDoItLater;
+
+  @iOSXCUITFindBy(accessibility = "StaffCheckbox_ImageStyle_100")
+  private WebElement checkBoxAcknowledgement;
 }

@@ -8,16 +8,17 @@ import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.DELET
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.GIVE_NICKNAME;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.SAVE_NICKNAME;
 import static com.automation.lac.qa.fanapp.mobile.enums.InputsDescription.NICKNAME;
-import static com.automation.lac.qa.fanapp.mobile.utils.DeviceActions.scrollIntoListToElementWithCondition;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.sendKeys;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.setTextField;
+import static com.automation.lac.qa.utils.mobile.SwipeActions.swipeUntilFindElement;
+import static com.automation.lac.qa.utils.mobile.SwipeDirections.DOWN_TO_UP;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementVisibility;
 
 import com.automation.lac.qa.fanapp.api.models.PaymentMethodFile;
-import com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections;
 import com.automation.lac.qa.fanapp.mobile.screens.paymentmethods.CardDetailsScreen;
-import com.automation.lac.qa.fanapp.mobile.utils.DeviceActions;
 import com.automation.lac.qa.fanapp.mobile.utils.PaymentUtils;
+import com.automation.lac.qa.utils.mobile.WaitActions;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +34,9 @@ public class CardDetailsTask extends CardDetailsScreen {
    */
   public void giveItANickname(String nickname) {
     if (!nickname.isEmpty()) {
+      waitForElementVisibility(getBtnGiveItANickname(), 5);
       click(getBtnGiveItANickname(), GIVE_NICKNAME.getValue());
+      waitForElementVisibility(getTxtEditNicknameAtModal(), 5);
       setTextField(getTxtEditNicknameAtModal(), nickname, NICKNAME.getValue());
       click(getBtnSaveNicknameAtModal(), SAVE_NICKNAME.getValue());
     } else {
@@ -78,7 +81,7 @@ public class CardDetailsTask extends CardDetailsScreen {
   public void deletePaymentMethod(PaymentMethodFile.PaymentMethod card,
                                   String cardToReplacePreferred) {
     boolean isPreferred =
-      !DeviceActions.waitForElementVisibility(getChkPreferredPaymentMethod(), 5);
+      !WaitActions.isTheElementVisible(getChkPreferredPaymentMethod(), 5);
     List<PaymentMethodFile.PaymentMethod> cards = PaymentUtils.getAllUsedCards();
     click(getBtnDeletePaymentMethod(), DELETE_PAYMENT_METHOD.getValue());
     if (!cards.isEmpty() && cards.size() <= 2) {
@@ -86,11 +89,9 @@ public class CardDetailsTask extends CardDetailsScreen {
     } else if (cards.size() >= 3) {
       if (isPreferred) {
         if (cardToReplacePreferred != null) {
-          click(
-            scrollIntoListToElementWithCondition(getLstPaymentMethodsInConfirmationModal(),
-              SwipeDirections.DOWN_TO_UP, 25,
-              webElement -> webElement.getAttribute(txtAttribute).contains(cardToReplacePreferred)),
-            "replacement preferred card on modal list");
+          swipeUntilFindElement(getCardNumber(cardToReplacePreferred), DOWN_TO_UP,
+            getDeleteModalView());
+          click(getCardNumber(cardToReplacePreferred), cardToReplacePreferred);
         }
         click(getBtnDeleteAndUpdateInConfirmationModal(),
           DELETE_UPDATE_IN_CONFIRMATION_MODAL.getValue());

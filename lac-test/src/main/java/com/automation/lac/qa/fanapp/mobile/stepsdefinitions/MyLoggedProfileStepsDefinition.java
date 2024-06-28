@@ -1,5 +1,6 @@
 package com.automation.lac.qa.fanapp.mobile.stepsdefinitions;
 
+import static com.automation.lac.qa.fanapp.mobile.enums.BannerMessages.GAME_FACE_AND_AGE_SUCCESSFULLY_ADDED;
 import static com.automation.lac.qa.fanapp.mobile.enums.ReminderNames.AGE_VERIFICATION;
 
 import com.automation.lac.qa.fanapp.mobile.questions.HomeQuestions;
@@ -28,13 +29,12 @@ public class MyLoggedProfileStepsDefinition {
     + "(Game Face ID|Age Verification|Payment Method|Identity Pass) reminder$")
   public void theUserTapsOnReminderCard(String reminderName) {
     myProfileLoggedTasks.goToReminderCard(reminderName);
-    myLoggedProfileQuestions.validateReminderIsVisible(reminderName);
     myProfileLoggedTasks.clickOnReminder(reminderName);
   }
 
   @And("the user closes the section in the app")
   public void theUserClosesTheSectionInTheApp() {
-    myAccountSettingsTasks.logoutFromTheApp();
+    myProfileLoggedTasks.logoutFromTheApp();
     homeQuestions.checkElementsOnScreen();
   }
 
@@ -50,10 +50,8 @@ public class MyLoggedProfileStepsDefinition {
    * "Payment Method"
    * "Identity Pass"
    */
-  @And("^the (Game Face ID|Age Verification|Payment Method|Identity Pass)"
-    + " reminder is( not)? displayed$")
+  @And("^the (.*) reminder is( not)? displayed$")
   public void theUserValidatesReminderIsNotVisible(String reminderName, String condition) {
-    myProfileLoggedTasks.goToReminderCard(reminderName);
     myLoggedProfileQuestions.validateReminderVisibility(reminderName, condition);
   }
 
@@ -69,7 +67,7 @@ public class MyLoggedProfileStepsDefinition {
 
   @And("the user navigates to My Vehicles from My Profile")
   public void theUserNavigatesToMyVehiclesFromProfile() {
-    myLoggedProfileTasks.goToMyVehiclesFromMyProfile();
+    myLoggedProfileTasks.goToMyVehicles();
   }
 
   /**
@@ -77,7 +75,7 @@ public class MyLoggedProfileStepsDefinition {
    */
   @And("the user navigates to my payments from my profile")
   public void theUserNavigatesToMyPaymentsFromProfile() {
-    myLoggedProfileTasks.goToMyPaymentsFromMyProfile();
+    myLoggedProfileTasks.goToMyPayments();
   }
 
   /**
@@ -88,8 +86,19 @@ public class MyLoggedProfileStepsDefinition {
     myLoggedProfileTasks.clickBackOnMyProfile();
   }
 
+  @And("the user returns to the my account settings screen from My Payment Methods Management")
+  public void theUserReturnsToTheMyAccountSettingsScreenFromMyPaymentMethodsManagement() {
+    myAccountSettingsTasks.goToMyAccountSettingsFromMyPaymentMethodsManagement();
+  }
+
   @And("the user returns to the Profile screen from My Payment Methods Management")
   public void theUserReturnsToTheProfileScreenFromMyPaymentMethodsManagement() {
-    myAccountSettingsTasks.goToMyAccountSettingsFromMyPaymentMethodsManagement();
+    myAccountSettingsTasks.goToMyProfileFromMyPaymentMethodsManagement();
+  }
+
+  @And("the app shows success message for game face id registration")
+  public void theAppShowsSuccessMessageForGameFaceIdRegistration() {
+    myLoggedProfileQuestions.validateBannerMessage(
+      GAME_FACE_AND_AGE_SUCCESSFULLY_ADDED.getValue());
   }
 }

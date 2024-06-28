@@ -1,12 +1,13 @@
 package com.automation.lac.qa.fanapp.mobile.screens.identitycreateanaccount.components;
 
+import com.automation.lac.qa.pages.MobileBaseComponent;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import lombok.Getter;
 import org.openqa.selenium.WebElement;
 
 @Getter
-public class EnableLocationComponent {
+public class EnableLocationComponent extends MobileBaseComponent {
 
   @AndroidFindBy(id = "com.android.permissioncontroller:id/permission_allow_foreground_only_button")
   @iOSXCUITFindBy(accessibility = "Allow While Using App")

@@ -1,14 +1,18 @@
 package com.automation.lac.qa.fanapp.mobile.screens.paymentmethods;
 
+import static com.automation.lac.qa.utils.mobile.DeviceActions.getElement;
+
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import java.util.List;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 @Getter
+@Slf4j
 public class MyPaymentMethodsScreen extends MobileBaseScreen {
 
   @AndroidFindBy(uiAutomator = "textContains(\"ADD CARD\")")
@@ -49,17 +53,22 @@ public class MyPaymentMethodsScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(iOSNsPredicate = "label == \"YOU DON'T HAVE ANY PAYMENT METHOD YET\"")
   private WebElement lblNoPaymentMethodsYet;
 
+  @AndroidFindBy(id = "lcScrollableView")
+  @iOSXCUITFindBy(iOSNsPredicate = "type = 'XCUIElementTypeScrollView'")
+  private WebElement scrollableView;
+
   /**
    * get card Details Card Number
    */
   public static WebElement getCardNumber(String lastFour) {
+    String xpath;
     if (!isAndroid()) {
-      return getDriver().findElement(
-        By.xpath(String.format("//XCUIElementTypeStaticText[@name='card_"
-          + "details_card_number'][contains(@label,'%s')]", lastFour)));
+      xpath = String.format("//XCUIElementTypeStaticText[@name='payment_method_card_name_label']"
+        + "[contains(@label,'%s')]", lastFour);
     } else {
-      return getDriver().findElement(
-        By.xpath(String.format("//*[@resource-id='tvBrandName'][contains(@text,'%s')]", lastFour)));
+      xpath = String.format("//*[@resource-id='tvBrandName'][contains(@text,'%s')]", lastFour);
     }
+    log.info("Find element by xpath {}", xpath);
+    return getElement(By.xpath(xpath));
   }
 }

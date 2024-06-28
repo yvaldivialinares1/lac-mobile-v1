@@ -15,7 +15,8 @@ public class MyPaymentsTask extends MyPaymentsScreen {
   private final CommonsScreen commonsScreen = new CommonsScreen();
 
   public void goToMyProfileFromMyPayments() {
-    click(waitForElementToBeClickable(5, commonsScreen.getBtnBack()), BACK.getValue());
+    waitForElementToBeClickable(commonsScreen.getBtnBack(), 5);
+    click(commonsScreen.getBtnBack(), BACK.getValue());
   }
 
   public void clickOnPaymentMethodsManagement() {

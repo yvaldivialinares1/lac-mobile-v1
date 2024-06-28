@@ -3,9 +3,9 @@ package com.automation.lac.qa.fanapp.mobile.stepsdefinitions;
 import static com.automation.lac.qa.fanapp.mobile.enums.FanAppKeys.VEHICLES_INFO;
 import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 
-import com.automation.lac.qa.faker.models.VehicleInfo;
+import com.automation.lac.qa.faker.models.userinfo.VehicleInfo;
 import com.automation.lac.qa.fanapp.mobile.questions.RegisteredVehiclesQuestion;
-import com.automation.lac.qa.fanapp.mobile.tasks.myvehicles.NoRegisteredVehicleTask;
+import com.automation.lac.qa.fanapp.mobile.tasks.myvehicles.AddVehicleTask;
 import com.automation.lac.qa.fanapp.mobile.tasks.myvehicles.RegisteredVehicleTask;
 import io.cucumber.java.en.And;
 import java.util.List;
@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class VehiclesStepsDefinition {
 
-  private final NoRegisteredVehicleTask noRegisteredVehicleTask = new NoRegisteredVehicleTask();
+  private final AddVehicleTask addVehicleTask = new AddVehicleTask();
   private final RegisteredVehicleTask registeredVehicleTask = new RegisteredVehicleTask();
   private final RegisteredVehiclesQuestion vehiclesQuestion = new RegisteredVehiclesQuestion();
 
@@ -28,23 +28,19 @@ public class VehiclesStepsDefinition {
   @And("the user adds {int} vehicles")
   public void theUserAddsADefinedNumberOfVehicles(int numberOfVehicles) {
     List<VehicleInfo> vehicleList = getTestContext().get(VEHICLES_INFO.name());
-    var vehicleToAdd = vehicleList.stream().findFirst().orElseThrow();
-    vehicleList = noRegisteredVehicleTask.clickAddVehicle()
-      .completeAddVehicleProcess(vehicleToAdd, vehicleList);
-    vehicleList = registeredVehicleTask.addNewVehicles(numberOfVehicles, vehicleList);
-    getTestContext().set(VEHICLES_INFO.name(), vehicleList);
+    List<VehicleInfo> vehiclesToAdd = vehicleList.stream().limit(numberOfVehicles).toList();
+
+    addVehicleTask.addVehicleInformation(vehiclesToAdd);
+    getTestContext().set(VEHICLES_INFO.name(), vehiclesToAdd);
   }
 
   /**
    * Sees the updated list of vehicles
-   *
-   * @param numberOfVehicles integer
    */
-  @And("the user sees the updated list of {int} vehicles")
-  public void theUserSeesTheUpdatedListOfVehicles(int numberOfVehicles) {
+  @And("the user sees the updated list of vehicles")
+  public void theUserSeesTheUpdatedListOfVehicles() {
     List<VehicleInfo> vehicleList = getTestContext().get(VEHICLES_INFO.name());
-
-    vehiclesQuestion.listOfVehiclesMatchExpected(numberOfVehicles, vehicleList);
+    vehiclesQuestion.listOfVehiclesMatchExpected(vehicleList);
   }
 
   @And("the user navigates back from my vehicles to my profile")

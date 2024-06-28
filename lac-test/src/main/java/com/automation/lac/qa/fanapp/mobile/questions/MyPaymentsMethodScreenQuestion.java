@@ -1,46 +1,28 @@
 package com.automation.lac.qa.fanapp.mobile.questions;
 
 import static com.automation.lac.qa.assertions.SoftAssertManager.getSoftAssert;
-import static com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections.UP_TO_DOWN;
+import static com.automation.lac.qa.fanapp.api.models.PaymentMethodFile.PaymentMethod;
+import static com.automation.lac.qa.fanapp.mobile.utils.PaymentUtils.getAllUsedCards;
+import static com.automation.lac.qa.fanapp.mobile.utils.PaymentUtils.getCardLastFourDigits;
+import static com.automation.lac.qa.utils.mobile.SwipeActions.swipeUntilFindElement;
+import static com.automation.lac.qa.utils.mobile.SwipeDirections.DOWN_TO_UP;
 
-import com.automation.lac.qa.fanapp.api.models.PaymentMethodFile;
 import com.automation.lac.qa.fanapp.mobile.screens.paymentmethods.MyPaymentMethodsScreen;
 import com.automation.lac.qa.fanapp.mobile.utils.DeviceActions;
-import com.automation.lac.qa.fanapp.mobile.utils.PaymentUtils;
+import com.automation.lac.qa.utils.mobile.WaitActions;
 import java.util.List;
 
 public class MyPaymentsMethodScreenQuestion extends MyPaymentMethodsScreen {
-  public static String txtAttribute = !isAndroid()  ? "label" : "text";
 
   /**
    * check and validate the updated list of Payment
    */
   public void validatePaymentList() {
-    List<PaymentMethodFile.PaymentMethod> cards = PaymentUtils.getAllUsedCards();
-    for (PaymentMethodFile.PaymentMethod card : cards) {
+    List<PaymentMethod> cards = getAllUsedCards();
+    for (PaymentMethod card : cards) {
       getSoftAssert().assertTrue(isCardOnList(card),
-        String.format("card %s is displayed",
-          PaymentUtils.getCardLastFourDigits(card.getCardNumber())));
+        String.format("card %s is displayed", getCardLastFourDigits(card.getCardNumber())));
     }
-  }
-
-  /**
-   * @param card card object to be asserted it exist in the card list
-   */
-  public void isCardAdded(PaymentMethodFile.PaymentMethod card) {
-    DeviceActions.waitForElementVisibility(getLblPaymentMethods(), 5);
-    boolean isFound = isCardOnList(card);
-    getSoftAssert().assertTrue(isFound,
-      String.format("card %s is displayed", card.getCardNumber()));
-  }
-
-  /**
-   * @param card card object to be asserted it does not exist in the card list
-   */
-  public void isCardDeleted(PaymentMethodFile.PaymentMethod card) {
-    boolean isFound = isCardOnList(card);
-    getSoftAssert().assertFalse(isFound,
-      String.format("card %s is not displayed", card.getCardNumber()));
   }
 
   /**
@@ -49,9 +31,14 @@ public class MyPaymentsMethodScreenQuestion extends MyPaymentMethodsScreen {
    * @param card payment method object
    * @return true/false if the card is found and displayed
    */
-  private boolean isCardOnList(PaymentMethodFile.PaymentMethod card) {
-    return DeviceActions.scrollIntoListToElementWithCondition(getCardsList(), UP_TO_DOWN, 40,
-      webElement -> webElement.getAttribute(txtAttribute)
-        .contains(PaymentUtils.getCardLastFourDigits(card.getCardNumber()))).isDisplayed();
+  private boolean isCardOnList(PaymentMethod card) {
+    String lastFour = getCardLastFourDigits(card.getCardNumber());
+    if (isAndroid()) {
+      swipeUntilFindElement(getCardNumber(lastFour), DOWN_TO_UP, getScrollableView());
+    } else {
+      DeviceActions.verticallyScrollToElement(getCardNumber(lastFour), DOWN_TO_UP, 5, 30);
+    }
+    return WaitActions.isTheElementVisible(
+      getCardNumber(getCardLastFourDigits(card.getCardNumber())), 1);
   }
 }

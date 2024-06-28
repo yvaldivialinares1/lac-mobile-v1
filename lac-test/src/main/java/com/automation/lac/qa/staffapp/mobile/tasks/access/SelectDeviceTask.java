@@ -3,6 +3,7 @@ package com.automation.lac.qa.staffapp.mobile.tasks.access;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
 
 import com.automation.lac.qa.staffapp.mobile.screens.access.SelectDeviceScreen;
+import io.qameta.allure.Step;
 import java.util.List;
 import org.openqa.selenium.WebElement;
 
@@ -14,6 +15,7 @@ public class SelectDeviceTask extends SelectDeviceScreen {
    * @param deviceIds List of devices ids to be selected.
    * @return SelectDeviceTask
    */
+  @Step("select checkboxes related to specific devices as {deviceIds}")
   public SelectDeviceTask selectDevicesById(List<String> deviceIds) {
     deviceIds.forEach(id -> {
       WebElement checkBoxByDeviceId = getDeviceCheckBoxByDeviceId(id);
@@ -26,6 +28,6 @@ public class SelectDeviceTask extends SelectDeviceScreen {
    * tap button to confirm devices selection.
    */
   public void confirmSelectedDevices() {
-    click(getBtnConfirmSelectDeviceFilter(), "CONFIRM");
+    click(getBtnConfirmSelectDeviceFilter(), "confirm");
   }
 }

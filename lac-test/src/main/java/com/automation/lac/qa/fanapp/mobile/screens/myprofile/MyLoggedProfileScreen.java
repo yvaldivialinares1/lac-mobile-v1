@@ -14,25 +14,29 @@ public class MyLoggedProfileScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(iOSNsPredicate = "name == \"id_btn_home_my_profile_account_settings_title\"")
   private WebElement btnMyAccountSettings;
 
-  @AndroidFindBy(uiAutomator = "descriptionContains(\"My Payments  Button\")")
+  @AndroidFindBy(uiAutomator = "descriptionContains(\"My Payments\")")
   @iOSXCUITFindBy(iOSNsPredicate = "name == \"id_btn_home_my_profile_payments_title\"")
   private WebElement btnMyPayments;
 
-  @AndroidFindBy(uiAutomator = "descriptionContains(\"My Tickets  Button\")")
+  @AndroidFindBy(uiAutomator = "descriptionContains(\"My Tickets\")")
   @iOSXCUITFindBy(iOSNsPredicate = "name == \"id_btn_home_my_profile_tickets_title\"")
   private WebElement btnMyTickets;
 
-  @AndroidFindBy(uiAutomator = "descriptionContains(\"My Vehicles  Button\")")
+  @AndroidFindBy(uiAutomator = "descriptionContains(\"My Vehicles\")")
   @iOSXCUITFindBy(iOSNsPredicate = "name == \"id_btn_home_my_profile_vehicles_title\"")
   private WebElement btnMyVehicles;
 
-  @AndroidFindBy(uiAutomator = "descriptionContains(\"My Rewards  Button\")")
+  @AndroidFindBy(uiAutomator = "descriptionContains(\"My Rewards\")")
   @iOSXCUITFindBy(iOSNsPredicate = "name == \"id_btn_home_my_profile_rewards_title\"")
   private WebElement btnMyRewards;
 
-  @AndroidFindBy(uiAutomator = "descriptionContains(\"App Settings  Button\")")
+  @AndroidFindBy(uiAutomator = "descriptionContains(\"App Settings\")")
   @iOSXCUITFindBy(iOSNsPredicate = "name == \"id_btn_home_my_profile_app_settings_title\"")
   private WebElement btnAppSettings;
+
+  @AndroidFindBy(uiAutomator = "descriptionContains(\"Log Out\")")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_home_my_profile_logout_title'")
+  private WebElement btnLogOut;
 
   @AndroidFindBy(xpath = "//android.widget.ScrollView/android.view.View[3]/android.view.View")
   @iOSXCUITFindBy(iOSNsPredicate = "name CONTAINS \"Card\" AND type == \"XCUIElementTypeButton\"")
@@ -68,5 +72,21 @@ public class MyLoggedProfileScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'Back' AND type == 'XCUIElementTypeButton'")
   private WebElement btnBack;
 
-  String xpathCard = "//android.widget.TextView[contains(@text,\"%s\")]";
+  @AndroidFindBy(xpath = "//android.view.View[contains(@content-desc,'Card number')]"
+    + "/parent::android.view.View/parent::android.view.View")
+  private WebElement reminderCardsView;
+
+  @AndroidFindBy(xpath = "//android.widget.TextView[@text='COMPLETE YOUR PROFILE!']"
+    + "/following-sibling::android.view.View//android.widget.TextView[3]")
+  private WebElement reminderCardsText;
+
+  @AndroidFindBy(xpath = "(//android.view.View[contains(@content-desc,'Card number')])[1]")
+  private WebElement reminderCardPosition;
+
+  @AndroidFindBy(uiAutomator = "resourceId(\"bannerMessageRow\")"
+    + ".childSelector(className(\"android.view.View\"))")
+  @iOSXCUITFindBy(iOSNsPredicate = "TBD")
+  private WebElement lblBannerMessage;
+
+  protected String xpathCard = "//android.widget.TextView[contains(@text,'%s')]";
 }

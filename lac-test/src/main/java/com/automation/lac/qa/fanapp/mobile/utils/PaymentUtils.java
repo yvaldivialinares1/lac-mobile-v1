@@ -1,46 +1,44 @@
 package com.automation.lac.qa.fanapp.mobile.utils;
 
+import static com.automation.lac.qa.fanapp.api.models.PaymentMethodFile.PaymentMethod;
 import static com.automation.lac.qa.fanapp.mobile.enums.FanAppKeys.PAYMENT_METHODS;
+import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 
-import com.automation.lac.qa.fanapp.api.models.PaymentMethodFile;
-import com.automation.lac.qa.utils.TestContextManager;
+import java.security.SecureRandom;
 import java.util.List;
-import java.util.Random;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class PaymentUtils {
 
-
   /**
    * @return a card from test context that has not been used.
    */
-  public static PaymentMethodFile.PaymentMethod getNotUsedCard() {
+  public static PaymentMethod getNotUsedCard() {
     return getCard(false);
   }
 
   /**
    * @return a card from test context that has been used.
    */
-  public static PaymentMethodFile.PaymentMethod getUsedCard() {
+  public static PaymentMethod getUsedCard() {
     return getCard(true);
   }
 
   /**
    * @return a card from test context that has been used.
    */
-  public static List<PaymentMethodFile.PaymentMethod> getAllUsedCards() {
+  public static List<PaymentMethod> getAllUsedCards() {
     var cards = getTestCards();
-    return cards.stream().filter(PaymentMethodFile.PaymentMethod::isUsed)
-      .toList();
+    return cards.stream().filter(PaymentMethod::isUsed).toList();
   }
 
   /**
    * @param isUsedStatus state of the card usage (true= used/false=not used)
    * @return a random card object when matches the isUsed condition or null
    */
-  public static PaymentMethodFile.PaymentMethod getCard(boolean isUsedStatus) {
-    Random random = new Random();
+  public static PaymentMethod getCard(boolean isUsedStatus) {
+    SecureRandom random = new SecureRandom();
     var filteredList =
       getTestCards().stream().filter(paymentMethod -> paymentMethod.isUsed() == isUsedStatus)
         .toList();
@@ -56,8 +54,7 @@ public class PaymentUtils {
    *
    * @param targetCard card objet to update its usage status (true= used/false=not used).
    */
-  public static void setCardUsageInTest(PaymentMethodFile.PaymentMethod targetCard,
-                                        boolean usageStatus) {
+  public static void setCardUsageInTest(PaymentMethod targetCard, boolean usageStatus) {
     getTestCards().remove(targetCard);
     targetCard.setUsed(usageStatus);
     getTestCards().add(targetCard);
@@ -68,8 +65,7 @@ public class PaymentUtils {
    *
    * @param targetCard card objet to update its usage status (true= used/false=not used).
    */
-  public static void setCardNicknameInTest(PaymentMethodFile.PaymentMethod targetCard,
-                                           String nickname) {
+  public static void setCardNicknameInTest(PaymentMethod targetCard, String nickname) {
     getTestCards().remove(targetCard);
     targetCard.setNickname(nickname);
     getTestCards().add(targetCard);
@@ -86,9 +82,8 @@ public class PaymentUtils {
   /**
    * @return a list of cards in the context manager
    */
-  private static List<PaymentMethodFile.PaymentMethod> getTestCards() {
-    return (List<PaymentMethodFile.PaymentMethod>) TestContextManager.getTestContext()
-      .get(PAYMENT_METHODS.name());
+  private static List<PaymentMethod> getTestCards() {
+    return getTestContext().get(PAYMENT_METHODS.name());
   }
 
   /**
@@ -96,11 +91,9 @@ public class PaymentUtils {
    *
    * @param targetCard card objet to update its preferred status (true= used/false=not used).
    */
-  public static void setPreferredCardStatus(PaymentMethodFile.PaymentMethod targetCard,
-                                            boolean preferredStatus) {
+  public static void setPreferredCardStatus(PaymentMethod targetCard, boolean preferredStatus) {
     getTestCards().remove(targetCard);
     targetCard.setPreferred(preferredStatus);
     getTestCards().add(targetCard);
   }
-
 }

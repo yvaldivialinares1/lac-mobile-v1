@@ -1,0 +1,42 @@
+[
+  {
+    "brand": "Mastercard",
+    "cardNumber": "5112345112345114",
+    "name": "Test Mastercard",
+    "securityCode": 123,
+    "expirationDate": "0228",
+    "type": "CREDIT",
+    "used": false,
+    "active": true
+  },
+  {
+    "brand": "Visa",
+    "cardNumber": "4110144110144115",
+    "name": "Test Visa",
+    "securityCode": 234,
+    "expirationDate": "1028",
+    "type": "CREDIT",
+    "used": false,
+    "active": true
+  },
+  {
+    "brand": "American Express",
+    "cardNumber": "371144371144376",
+    "name": "Test Amex",
+    "securityCode": 6789,
+    "expirationDate": "0428",
+    "type": "CREDIT",
+    "used": false,
+    "active": true
+  },
+  {
+    "brand": "Discover",
+    "cardNumber": "6559906559906557",
+    "name": "Test Discover",
+    "securityCode": 365,
+    "expirationDate": "1128",
+    "type": "CREDIT",
+    "used": false,
+    "active": true
+  }
+]

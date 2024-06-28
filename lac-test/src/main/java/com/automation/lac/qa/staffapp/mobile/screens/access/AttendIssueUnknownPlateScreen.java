@@ -3,7 +3,6 @@ package com.automation.lac.qa.staffapp.mobile.screens.access;
 import com.automation.lac.qa.pages.MobileBaseScreen;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import lombok.Getter;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 @Getter
@@ -47,66 +46,4 @@ public class AttendIssueUnknownPlateScreen extends MobileBaseScreen {
 
   @iOSXCUITFindBy(accessibility = "attend_issue_primary_button")
   private WebElement attendIssuePrimaryButton;
-
-  /**
-   * Get Fan Account Result by index
-   */
-  public WebElement getFanAccountResultByIndex(String recordIndex) {
-    String locator = "//XCUIElementTypeOther[@name='fan_info_result_list_" + recordIndex + "']";
-    return getDriver().findElement(By.xpath(locator));
-  }
-
-  /**
-   * Get staff profile by index
-   */
-  public WebElement getStaffProfileByIndex(String recordIndex) {
-    String locator = "//XCUIElementTypeOther[@name='fan_info_result_list_" + recordIndex + "']"
-            + "//XCUIElementTypeImage[@name='navigation_staff_profile']";
-    return getDriver().findElement(By.xpath(locator));
-  }
-
-  /**
-   * Get profile name initials by index
-   */
-  public WebElement getProfileNameInitialsByIndex(String recordIndex) {
-    String locator = "//XCUIElementTypeOther[@name='fan_info_result_list_" + recordIndex + "']"
-            + "//XCUIElementTypeStaticText[@name='profile_name_initials']";
-    return getDriver().findElement(By.xpath(locator));
-  }
-
-  /**
-   * Get first and last name by index
-   */
-  public WebElement getFirstLastNameByIndex(String recordIndex) {
-    String locator = "//XCUIElementTypeOther[@name='fan_info_result_list_" + recordIndex + "']"
-            + "//XCUIElementTypeStaticText[@name='first_last_name_label']";
-    return getDriver().findElement(By.xpath(locator));
-  }
-
-  /**
-   * Get chosen name by index
-   */
-  public WebElement getChosenNameByIndex(String recordIndex) {
-    String locator = "//XCUIElementTypeOther[@name='fan_info_result_list_" + recordIndex + "']"
-            + "//XCUIElementTypeStaticText[@name='chosen_name_label']";
-    return getDriver().findElement(By.xpath(locator));
-  }
-
-  /**
-   * Get email label by index
-   */
-  public WebElement getEmailLabelByIndex(String recordIndex) {
-    String locator = "//XCUIElementTypeOther[@name='fan_info_result_list_" + recordIndex + "']"
-            + "//XCUIElementTypeStaticText[@name=\"phone_label\"]";
-    return getDriver().findElement(By.xpath(locator));
-  }
-
-  /**
-   * Get phone label by index
-   */
-  public WebElement getPhoneLabelByIndex(String recordIndex) {
-    String locator = "//XCUIElementTypeOther[@name='fan_info_result_list_" + recordIndex + "']"
-            + "//XCUIElementTypeStaticText[@name='phone_label']";
-    return getDriver().findElement(By.xpath(locator));
-  }
 }

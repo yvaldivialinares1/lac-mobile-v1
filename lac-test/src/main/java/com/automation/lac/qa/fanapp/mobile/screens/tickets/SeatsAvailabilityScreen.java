@@ -32,7 +32,7 @@ public class SeatsAvailabilityScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(accessibility = "ticket_seat_list_count_preview_edit_button")
   private WebElement seatSelectionTicketInfoEditButton;
 
-  @AndroidFindBy(uiAutomator = "resourceId(\"seatSelectionMainHeaderImage\")")
+  @AndroidFindBy(id = "seatSelectionMainHeaderImage")
   @iOSXCUITFindBy(accessibility = "ticket_seat_list_header")
   private WebElement seatSelectionMainHeaderImage;
 
@@ -53,9 +53,16 @@ public class SeatsAvailabilityScreen extends MobileBaseScreen {
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeButton[@label='Show Seats Together First']")
   private WebElement sortSeatsBySeatTogether;
 
-  @AndroidFindBy(xpath = "//*[@resource-id='seatSelectionSeatInfoContainer']")
+  @AndroidFindBy(uiAutomator = "resourceId(\"seatSelectionSeatInfoContainer\")")
   @iOSXCUITFindBy(xpath = "//XCUIElementTypeImage[@name='seat_list_card_bg_small']"
     + "//parent::XCUIElementTypeOther")
   private List<SuggestedSeatComponent> listSuggestedSeat;
 
+  @AndroidFindBy(id = "bannerMessageRow")
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'banner_message_view'")
+  private WebElement lblInformationBanner;
+
+  @AndroidFindBy(xpath = "//android.view.View[@resource-id='seatSelectionMainHeaderRow']"
+    + "/following-sibling::android.view.View")
+  private WebElement scrollSeats;
 }

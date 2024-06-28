@@ -21,7 +21,7 @@ public enum VehicleModel {
   KIA(Arrays.asList("Sportage", "Forte", "Telluride", "Sorento", "Soul")),
   NISSAN(Arrays.asList("Rogue", "Sentra", "Altima", "Frontier", "Kicks")),
   DODGE(Arrays.asList("Durango", "Challenger", "Charger", "Journey", "Hornet")),
-  TESLA(Arrays.asList("Model 3", "Model Y", "Model X", "Model S", "Cybertruck")),
+  TESLA(Arrays.asList("Model3", "ModelY", "ModelX", "ModelS", "Cybertruck")),
   TOYOTA(Arrays.asList("Camry", "Corolla", "Highlander", "RAV4", "Tacoma"));
 
   private final List<String> models;

@@ -20,4 +20,5 @@ public class LicensePlateDeleteDto {
   private String color;
   private int createdDate;
   private int updatedDate;
+  private String memberType;
 }

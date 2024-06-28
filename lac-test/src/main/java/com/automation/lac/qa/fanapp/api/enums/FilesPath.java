@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum FilesPath {
   CREDENTIALS_PATH("src/test/resources/test_data/fanapp/credentials.json"),
+  MISSION_CREDENTIALS_PATH("src/test/resources/test_data/fanapp/missionsCredentials.json"),
   PAYMENT_METHOD_PATH("src/test/resources/test_data/fanapp/paymentMethods.json");
 
   private final String text;

@@ -1,12 +1,13 @@
 package com.automation.lac.qa.fanapp.mobile.screens.identitycreateanaccount.components;
 
+import com.automation.lac.qa.pages.MobileBaseComponent;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.iOSXCUITFindBy;
 import lombok.Getter;
 import org.openqa.selenium.WebElement;
 
 @Getter
-public class AllowNotificationsComponent {
+public class AllowNotificationsComponent extends MobileBaseComponent {
 
   @AndroidFindBy(id = "com.android.permissioncontroller:id/permission_allow_button")
   @iOSXCUITFindBy(accessibility = "Allow")

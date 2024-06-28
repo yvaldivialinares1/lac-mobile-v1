@@ -1,7 +1,10 @@
 package com.automation.lac.qa.pages;
 
 import static com.automation.lac.qa.driver.AppiumConstants.ANDROID_PLATFORM;
+import static com.automation.lac.qa.driver.AppiumConstants.deviceName;
 import static com.automation.lac.qa.driver.AppiumConstants.platformName;
+import static com.automation.lac.qa.utils.Constants.IPAD_DEVICE_NAME;
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 
 import com.automation.lac.qa.driver.Device;
 import io.appium.java_client.AppiumDriver;
@@ -12,7 +15,7 @@ import org.openqa.selenium.support.PageFactory;
 
 @Slf4j
 @Getter
-public class MobileBaseScreen {
+public abstract class MobileBaseScreen {
 
   private static final ThreadLocal<AppiumDriver> driverThreadLocal = new ThreadLocal<>();
 
@@ -58,8 +61,10 @@ public class MobileBaseScreen {
       PageFactory.initElements(new AppiumFieldDecorator(getDriver()), this);
     } catch (Exception e) {
       log.error("Failed to initialize page elements using PageFactory. "
-        + "There might be an issue with the Appium driver initialization or "
-        + "the elements' locators may be invalid. Exception message: {}", e.getMessage(), e);
+          + "There might be an issue with the Appium driver initialization or "
+          + "the elements' locators may be invalid. Exception message: {}",
+        e.getMessage(),
+        e);
     }
   }
 
@@ -71,4 +76,14 @@ public class MobileBaseScreen {
   public static boolean isAndroid() {
     return platformName.equalsIgnoreCase(ANDROID_PLATFORM);
   }
+
+  /**
+   * Checks if the current device is an iPad.
+   *
+   * @return {@code true} if the current device is an iPad, {@code false} otherwise.
+   */
+  public static boolean isIpad() {
+    return containsIgnoreCase(deviceName, IPAD_DEVICE_NAME);
+  }
+
 }

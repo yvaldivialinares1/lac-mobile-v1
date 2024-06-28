@@ -22,7 +22,7 @@ public enum InputsDescription {
   MODEL("Model"),
   MONTH("Set month"),
   NAME_ON_CARD("Name on card"),
-  NICKNAME("nickname edit-box."),
+  NICKNAME("nickname"),
   OTP_CODE("OTP code"),
   PASSWORD("password"),
   PHONE_NUMBER("Phone Number Input"),

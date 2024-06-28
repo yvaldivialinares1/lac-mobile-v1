@@ -8,11 +8,12 @@ import org.openqa.selenium.WebElement;
 
 @Getter
 public class ModalLogOutScreen extends MobileBaseScreen {
+
   @AndroidFindBy(uiAutomator = "resourceId(\"btnPrimary\")")
-  @iOSXCUITFindBy(iOSNsPredicate = "name == \"modal_message_primary_button\"")
-  WebElement btnYesLogMeOut;
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'id_btn_yes,_log_me_out_ds_button'")
+  private WebElement btnYesLogMeOut;
 
   @AndroidFindBy(uiAutomator = "resourceId(\"btnSecondary\")")
-  @iOSXCUITFindBy(iOSNsPredicate = "name == \"modal_message_secondary_button\"")
-  WebElement btnCancel;
+  @iOSXCUITFindBy(iOSNsPredicate = "name == 'modal_message_secondary_button'")
+  private WebElement btnCancel;
 }

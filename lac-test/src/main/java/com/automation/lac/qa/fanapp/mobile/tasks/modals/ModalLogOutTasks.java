@@ -7,6 +7,7 @@ import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
 import com.automation.lac.qa.fanapp.mobile.screens.modals.ModalLogOutScreen;
 
 public class ModalLogOutTasks extends ModalLogOutScreen {
+
   public void clickOnLogOutButton() {
     click(getBtnYesLogMeOut(), YES_LOG_ME_OUT.getValue());
   }

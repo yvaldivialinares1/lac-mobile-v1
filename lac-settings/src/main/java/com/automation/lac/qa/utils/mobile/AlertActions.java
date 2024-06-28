@@ -1,16 +1,16 @@
 package com.automation.lac.qa.utils.mobile;
 
+import static com.automation.lac.qa.driver.AppiumConstants.WAIT_TIMEOUT;
 import static com.automation.lac.qa.pages.MobileBaseScreen.getDriver;
+import static com.automation.lac.qa.utils.mobile.WaitActions.createFluentWait;
 
 import com.automation.lac.qa.pages.MobileBaseScreen;
-import io.appium.java_client.AppiumDriver;
+import io.qameta.allure.Allure;
 import java.time.Duration;
 import java.util.HashMap;
-import java.util.NoSuchElementException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
 
 @Slf4j
 @UtilityClass
@@ -19,28 +19,45 @@ public class AlertActions {
   HashMap<String, String> args = new HashMap<>();
 
   /**
-   * Creates a FluentWait instance for AppiumDriver with a specified timeout and polling interval.
-   *
-   * @param timeout The maximum time to wait for a condition.
-   * @param polling The interval to poll for a condition.
-   * @return A FluentWait instance configured for AppiumDriver.
-   */
-  public static FluentWait<AppiumDriver> fluentWait(Duration timeout, Duration polling) {
-    return new FluentWait<>(MobileBaseScreen.getDriver())
-      .withTimeout(timeout)
-      .pollingEvery(polling)
-      .ignoring(NoSuchElementException.class);
-  }
-
-  /**
    * Wait for alert to be present
+   *
    * @param buttonLabel expected button label
    */
   public void tapIosAlertOption(String buttonLabel) {
-    fluentWait(
-      Duration.ofSeconds(10), Duration.ofSeconds(1)).until(ExpectedConditions.alertIsPresent());
-    args.put("buttonLabel", buttonLabel);
-    args.put("action", "accept");
-    getDriver().executeScript("mobile: alert", args, null);
+    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+    try {
+      createFluentWait(MobileBaseScreen.getDriver(),
+        Duration.ofSeconds(10), Duration.ofSeconds(1), "Alert is not present").until(
+        ExpectedConditions.alertIsPresent());
+      args.put("buttonLabel", buttonLabel);
+      args.put("action", "accept");
+      getDriver().executeScript("mobile: alert", args, null);
+    } catch (Exception e) {
+      log.error("Could not tap on iOS alert option {} ", buttonLabel, e);
+      throw e;
+    } finally {
+      getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(WAIT_TIMEOUT));
+    }
+  }
+
+  /**
+   * Verify if iOS alert is displayed
+   *
+   * @return boolean
+   */
+  public boolean isDeviceAlertDisplayed(String expectedAlert) {
+    getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+    try {
+      createFluentWait(MobileBaseScreen.getDriver(),
+        Duration.ofSeconds(10), Duration.ofSeconds(1), "Alert is not present").until(
+        ExpectedConditions.alertIsPresent());
+      Allure.step(String.format("%s alert was displayed", expectedAlert));
+      return true;
+    } catch (Exception e) {
+      Allure.step(String.format("%s alert was not displayed", expectedAlert));
+      return false;
+    } finally {
+      getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(WAIT_TIMEOUT));
+    }
   }
 }

@@ -5,18 +5,25 @@ import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED
 import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED_TICKET_ROW;
 import static com.automation.lac.qa.fanapp.constants.TicketingConstants.SELECTED_TICKET_SECTION;
 import static com.automation.lac.qa.fanapp.mobile.enums.ButtonsDescription.SUGGESTED_SEAT;
-import static com.automation.lac.qa.fanapp.mobile.enums.SwipeDirections.DOWN_TO_UP;
-import static com.automation.lac.qa.fanapp.mobile.utils.DeviceActions.swipe;
-import static com.automation.lac.qa.fanapp.mobile.utils.DeviceActions.waitForElementBeClickable;
-import static com.automation.lac.qa.fanapp.mobile.utils.DeviceActions.waitForElementVisibility;
-import static com.automation.lac.qa.fanapp.mobile.utils.DeviceActions.waitForListWidgetsIsNotEmpty;
 import static com.automation.lac.qa.utils.TestContextManager.getTestContext;
 import static com.automation.lac.qa.utils.mobile.DeviceActions.click;
+import static com.automation.lac.qa.utils.mobile.SwipeActions.swipeElementToTheBorder;
+import static com.automation.lac.qa.utils.mobile.SwipeDirections.TOP_PAGE;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitElementDisappear;
+import static com.automation.lac.qa.utils.mobile.WaitActions.waitForElementVisibility;
 
+import com.automation.lac.qa.faker.models.UserInfo;
 import com.automation.lac.qa.fanapp.mobile.screens.tickets.SeatsAvailabilityScreen;
 import com.automation.lac.qa.fanapp.mobile.screens.tickets.component.SuggestedSeatComponent;
+import com.automation.lac.qa.utils.CustomException;
+import com.automation.lac.qa.utils.mobile.WaitActions;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class SeatsAvailabilityTask extends SeatsAvailabilityScreen {
+
+  private static final String ISOLATED_SEAT = "\"You can’t leave a single seat isolated."
+    + " Change your selection to proceed.\"\nBackend bug CA-44232:";
 
   /**
    * Select first suggested seat
@@ -25,9 +32,8 @@ public class SeatsAvailabilityTask extends SeatsAvailabilityScreen {
    */
   public void selectSuggestedSeat(int index) {
     waitForElementVisibility(getSeatSelectionMainHeaderImage(), 20);
-    swipe(DOWN_TO_UP, getSeatSelectionMainHeaderImage(), 0.1, 0.5);
-    waitForListWidgetsIsNotEmpty(20, getListSuggestedSeat());
-    waitForElementBeClickable(20, getListSuggestedSeat().get(index).getWrappedElement());
+    waitElementDisappear(getLblInformationBanner(), 5);
+    swipeElementToTheBorder(TOP_PAGE, getSeatSelectionMainHeaderImage());
 
     SuggestedSeatComponent suggestedSeat = getListSuggestedSeat().get(index);
     getTestContext().set(SELECTED_TICKET_PRICE, getSeatSelectionSeatPrice(suggestedSeat));
@@ -35,16 +41,24 @@ public class SeatsAvailabilityTask extends SeatsAvailabilityScreen {
       getSeatSelectionSeatPlaceSectionName(suggestedSeat));
     getTestContext().set(SELECTED_TICKET_ROW, getSeatSelectionSeatPlaceRowName(suggestedSeat));
     click(suggestedSeat.getWrappedElement(), SUGGESTED_SEAT.getValue());
+
+    //TODO Verify CustomException when https://laclippers.atlassian.net/browse/CA-44232 is fixed
+    if (WaitActions.isTheElementVisible(getLblInformationBanner(), 5)) {
+      throw new CustomException(ISOLATED_SEAT);
+    }
   }
 
   /**
    * get Seat Selection Seat Place Section Name
    */
   public String getSeatSelectionSeatPlaceSectionName(SuggestedSeatComponent suggestedSeat) {
-    if (isAndroid())
-      return suggestedSeat.getSectionSeatPlace().getText().split(" ")[0].trim();
-    else
-      return suggestedSeat.getSectionSeatPlace().getText().split("Row")[0].split(",")[1].trim();
+    if (isAndroid()) {
+      String[] seatInfo =
+        suggestedSeat.getSectionSeatInfo().getAttribute("content-desc").split("•")[0].trim()
+          .split(" ");
+      return seatInfo[seatInfo.length - 1];
+    } else
+      return suggestedSeat.getSectionSeatInfo().getText().split("Row")[0].split(",")[1].trim();
 
   }
 
@@ -53,9 +67,10 @@ public class SeatsAvailabilityTask extends SeatsAvailabilityScreen {
    */
   public String getSeatSelectionSeatPlaceRowName(SuggestedSeatComponent suggestedSeat) {
     if (isAndroid())
-      return suggestedSeat.getSectionSeatPlace().getText().split(" ")[3].trim();
+      return suggestedSeat.getSectionSeatInfo().getAttribute("content-desc").split("•")[1].trim()
+        .split(" ")[1];
     else
-      return suggestedSeat.getSectionSeatPlace().getText().split(",")[2].trim();
+      return suggestedSeat.getSectionSeatInfo().getText().split(",")[2].trim();
   }
 
   /**
@@ -87,9 +102,9 @@ public class SeatsAvailabilityTask extends SeatsAvailabilityScreen {
   }
 
   /**
-   * get Seat Selection Seat Price
+   * get the actual Booked seat count
    */
-  public int getBookedSeatsTicketCount(int eventId) {
-    return getBookedSeats(eventId);
+  public int getBookedSeatsTicketCount(UserInfo userInfo, int eventId) {
+    return getBookedSeats(userInfo, eventId);
   }
 }

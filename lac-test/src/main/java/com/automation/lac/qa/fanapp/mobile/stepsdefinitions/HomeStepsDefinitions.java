@@ -1,7 +1,6 @@
 package com.automation.lac.qa.fanapp.mobile.stepsdefinitions;
 
 import com.automation.lac.qa.fanapp.mobile.tasks.home.HomeTasks;
-import com.automation.lac.qa.fanapp.mobile.tasks.home.WelcomeHomeTask;
 import com.automation.lac.qa.fanapp.mobile.tasks.myprofile.MyLoggedProfileTask;
 import com.automation.lac.qa.fanapp.mobile.tasks.myprofile.MyUnloggedProfileTask;
 import io.cucumber.java.en.And;
@@ -9,9 +8,7 @@ import io.cucumber.java.en.And;
 public class HomeStepsDefinitions {
 
   private final HomeTasks homeTasks = new HomeTasks();
-
   private final MyLoggedProfileTask myLoggedProfileTasks = new MyLoggedProfileTask();
-  private final WelcomeHomeTask welcomeHomeTask = new WelcomeHomeTask();
   private final MyUnloggedProfileTask myUnloggedProfileTask = new MyUnloggedProfileTask();
 
   @And("the user navigates to my profile")

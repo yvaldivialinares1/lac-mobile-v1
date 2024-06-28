@@ -12,19 +12,21 @@ import org.testng.xml.XmlSuite;
 @UtilityClass
 public class AppiumConstants {
 
+  private static final String DEFAULT_FALSE = "false";
   public static final String ANDROID_PLATFORM = "Android";
   public static final String IOS_PLATFORM = "iOS";
   public static String platformName;
   public static String platformVersion;
   public static String deviceName;
-  public static String mobileApp;
+  public static final String MOBILE_APP = PropertiesManager.getParameter("framework.mobile.app");
   public static final String DEVICE_UDID = PropertiesManager.getParameter("framework.device.udid");
   public static final String HUB_URL =
     PropertiesManager.getParameter("framework.mobile.hub.url");
   public static final boolean FULL_RESET =
-    Boolean.parseBoolean(getOptionalParameterOrDefault("framework.mobile.full.reset", "false"));
+    Boolean.parseBoolean(
+      getOptionalParameterOrDefault("framework.mobile.full.reset", DEFAULT_FALSE));
   public static final boolean NO_RESET =
-    Boolean.parseBoolean(getOptionalParameterOrDefault("framework.mobile.no.reset", "false"));
+    Boolean.parseBoolean(getOptionalParameterOrDefault("framework.mobile.no.reset", DEFAULT_FALSE));
   public static final int ANDROID_INSTALL_TIME_OUT =
     Integer.parseInt(PropertiesManager.getParameter("framework.mobile.android.install.timeout"));
   public static final int ANDROID_ADB_EXEC_TIME_OUT =
@@ -38,10 +40,12 @@ public class AppiumConstants {
     getOptionalParameterOrDefault("framework.mobile.app.version", "<UnknownAppVersion>");
   public static final int NEW_COMMAND_TIMEOUT =
     Integer.parseInt(PropertiesManager.getParameter("framework.mobile.new.command.timeout"));
+  public static final int WAIT_TIMEOUT =
+    Integer.parseInt(PropertiesManager.getParameter("framework.mobile.wait.timeout"));
   public static final int WDA_STARTUP_RETRY_INTERVAL =
     getTimeoutOrDefault();
   public static final String VIDEO_RECORDING =
-    getOptionalParameterOrDefault("framework.videoRecording","false");
+    getOptionalParameterOrDefault("framework.videoRecording", DEFAULT_FALSE);
 
   public static final String BS_USER_NAME =
     PropertiesManager.getPropertyFromEnv("BS_USERNAME");
@@ -60,8 +64,6 @@ public class AppiumConstants {
       PropertiesManager.getXmlParameters(xmlSuite, "framework.platform.version");
     deviceName =
       PropertiesManager.getXmlParameters(xmlSuite, "framework.device.name");
-    mobileApp =
-      PropertiesManager.getXmlParameters(xmlSuite, "framework.mobile.app");
   }
 
   /**
@@ -87,7 +89,7 @@ public class AppiumConstants {
    * @param defaultValue  The default value to return if the parameter is not found.
    * @return The value of the parameter or the default value if not present.
    */
-  private static String getOptionalParameterOrDefault(String parameterName, String defaultValue) {
+  public static String getOptionalParameterOrDefault(String parameterName, String defaultValue) {
     return Objects.requireNonNullElse(getOptionalParameter(parameterName), defaultValue);
   }
 

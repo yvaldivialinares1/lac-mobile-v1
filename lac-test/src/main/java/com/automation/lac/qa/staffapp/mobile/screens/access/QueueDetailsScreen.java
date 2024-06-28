@@ -19,8 +19,8 @@ public class QueueDetailsScreen extends MobileBaseScreen {
     @iOSXCUITBy(accessibility = "queue_details_no_lanes_selected_title")})
   private WebElement noDeviceSelectedIntoQueueDetailsMessageTitle;
 
-  @iOSXCUITFindAll({@iOSXCUITBy(accessibility = "//XCUIElementTypeStaticText"
-      + "[@name='queue_details_idap_id']"),
+  @iOSXCUITFindAll({
+    @iOSXCUITBy(accessibility = "//XCUIElementTypeStaticText" + "[@name='queue_details_idap_id']"),
     @iOSXCUITBy(accessibility = "//XCUIElementTypeStaticText[@name='queue_details_lane_id']")})
   private List<WebElement> listSelectedDevices;
 

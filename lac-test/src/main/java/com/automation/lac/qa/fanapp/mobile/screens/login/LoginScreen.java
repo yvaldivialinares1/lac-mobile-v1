@@ -32,4 +32,13 @@ public class LoginScreen extends MobileBaseScreen {
   @AndroidFindBy(uiAutomator = "description(\"LOG IN WITH ANOTHER USER\")")
   @iOSXCUITFindBy(iOSNsPredicate = "name == 'LOG IN WITH ANOTHER USER'")
   private WebElement btnLogInWithAnotherAccount;
+
+  @AndroidFindBy(uiAutomator = "descriptionContains(\"Email already exists for NBA\")")
+  @iOSXCUITFindBy(iOSNsPredicate =
+    "type == 'XCUIElementTypeStaticText' AND name == 'banner_message_text'")
+  WebElement bannerEmailExistForNba;
+
+  @AndroidFindBy(uiAutomator = "textContains(\"WELCOME HOME\")")
+  @iOSXCUITFindBy(accessibility = "id_label_welcome_home")
+  WebElement lblWelcomeHome;
 }

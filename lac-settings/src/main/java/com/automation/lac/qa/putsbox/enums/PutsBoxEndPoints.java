@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum PutsBoxEndPoints {
-
+  BASE_URL("https://putsbox.com"),
   GET_INSPECT("/inspect");
 
   private final String text;
